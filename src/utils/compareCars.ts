@@ -7,7 +7,10 @@ const calculateDiffPercent = (rivalValue: number, referenceValue: number) => {
 };
 
 export const compareAgainstCompetitorCars = (reference: ReferenceVehicle): BattleResult[] => {
-  return competitorCars
+  const sameTypeCompetitors = competitorCars.filter((car) => car.bodyType === reference.bodyType);
+  const comparisonBase = sameTypeCompetitors.length > 0 ? sameTypeCompetitors : competitorCars;
+
+  return comparisonBase
     .map((car) => {
       const powerDiffPercent = calculateDiffPercent(car.powerHp, reference.powerHp);
       const torqueDiffPercent = calculateDiffPercent(car.torqueNm, reference.torqueNm);

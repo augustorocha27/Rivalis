@@ -1,5 +1,5 @@
 import React, { RefObject, useMemo, useState } from 'react';
-import { Keyboard, StyleSheet, Text, View } from 'react-native';
+import { Keyboard, Pressable, StyleSheet, Text, View } from 'react-native';
 import {
   BottomSheetBackdrop,
   BottomSheetModal,
@@ -7,9 +7,10 @@ import {
 } from '@gorhom/bottom-sheet';
 import { LinearGradient } from 'expo-linear-gradient';
 import * as Haptics from 'expo-haptics';
-import { Car, Gauge, RotateCcw, Search, Zap } from 'lucide-react-native';
+import { CalendarDays, Car, RotateCcw, Search, Shapes } from 'lucide-react-native';
 
-import type { ReferenceVehicle } from '../@types/car';
+import type { ReferenceVehicle, VehicleBodyType } from '../@types/car';
+import { buildFordReference, vehicleBodyTypes } from '../data/fordReferences';
 import { colors, fonts, gradients, radius, shadows, spacing } from '../theme';
 import { AnimatedButton } from './AnimatedButton';
 import { RivalisInput } from './RivalisInput';
@@ -19,32 +20,26 @@ type VehicleSearchSheetProps = {
   onSubmit: (reference: ReferenceVehicle) => void;
 };
 
-const normalizeNumber = (value: string) => {
-  const onlyNumbers = value.replace(/[^0-9,.]/g, '').replace(',', '.');
-  return Number(onlyNumbers);
-};
-
 export function VehicleSearchSheet({ bottomSheetRef, onSubmit }: VehicleSearchSheetProps) {
-  const snapPoints = useMemo(() => ['62%', '86%'], []);
-  const [name, setName] = useState('Ford Ranger');
-  const [powerHp, setPowerHp] = useState('210');
-  const [torqueNm, setTorqueNm] = useState('500');
+  const snapPoints = useMemo(() => ['66%', '88%'], []);
+  const [model, setModel] = useState('Ford Ranger');
+  const [year, setYear] = useState('2025');
+  const [bodyType, setBodyType] = useState<VehicleBodyType>('Picape');
   const [error, setError] = useState('');
 
   const handleReset = async () => {
     await Haptics.selectionAsync();
-    setName('Ford Ranger');
-    setPowerHp('210');
-    setTorqueNm('500');
+    setModel('Ford Ranger');
+    setYear('2025');
+    setBodyType('Picape');
     setError('');
   };
 
   const handleSubmit = async () => {
-    const parsedPower = normalizeNumber(powerHp);
-    const parsedTorque = normalizeNumber(torqueNm);
+    const parsedYear = Number(year.replace(/[^0-9]/g, ''));
 
-    if (!name.trim() || !parsedPower || !parsedTorque || parsedPower <= 0 || parsedTorque <= 0) {
-      setError('Preencha nome, potência e torque com valores válidos.');
+    if (!model.trim() || !parsedYear || parsedYear < 1950 || parsedYear > 2100) {
+      setError('Preencha modelo e ano com valores válidos. Exemplo: Ford Ranger, 2025.');
       await Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
       return;
     }
@@ -52,11 +47,7 @@ export function VehicleSearchSheet({ bottomSheetRef, onSubmit }: VehicleSearchSh
     setError('');
     Keyboard.dismiss();
     await Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-    onSubmit({
-      name: name.trim(),
-      powerHp: parsedPower,
-      torqueNm: parsedTorque,
-    });
+    onSubmit(buildFordReference(model, year, bodyType));
     bottomSheetRef.current?.dismiss();
   };
 
@@ -82,52 +73,70 @@ export function VehicleSearchSheet({ bottomSheetRef, onSubmit }: VehicleSearchSh
             </View>
             <View style={styles.titleBlock}>
               <Text style={styles.kicker}>Comparador interno</Text>
-              <Text style={styles.title}>Informe o modelo Ford</Text>
+              <Text style={styles.title}>Pesquisar comparação</Text>
             </View>
           </View>
 
           <Text style={styles.description}>
-            O Rivalis cruza potência e torque contra concorrentes diretos para apoiar benchmarking, treinamento e argumentação técnica.
+            Informe apenas modelo, ano e tipo do veículo Ford. O MVP usa presets demonstrativos para gerar a análise competitiva e exibir os resultados em uma página dedicada.
           </Text>
 
           <View style={styles.formArea}>
             <RivalisInput
-              label="Modelo Ford de referência"
+              label="Modelo"
               icon={Car}
-              value={name}
-              onChangeText={setName}
+              value={model}
+              onChangeText={setModel}
               placeholder="Ex: Ford Ranger"
               autoCapitalize="words"
               returnKeyType="next"
             />
 
-            <View style={styles.doubleGrid}>
-              <View style={styles.doubleGridItem}>
-                <RivalisInput
-                  label="Potência"
-                  icon={Gauge}
-                  value={powerHp}
-                  onChangeText={setPowerHp}
-                  keyboardType="numeric"
-                  placeholder="210"
-                  suffix="hp"
-                />
+            <RivalisInput
+              label="Ano"
+              icon={CalendarDays}
+              value={year}
+              onChangeText={setYear}
+              keyboardType="numeric"
+              placeholder="2025"
+              maxLength={4}
+            />
+
+            <View style={styles.typeArea}>
+              <View style={styles.typeLabelRow}>
+                <Shapes size={17} color={colors.accent} strokeWidth={2.4} />
+                <Text style={styles.typeLabel}>Tipo</Text>
               </View>
-              <View style={styles.doubleGridItem}>
-                <RivalisInput
-                  label="Torque"
-                  icon={Zap}
-                  value={torqueNm}
-                  onChangeText={setTorqueNm}
-                  keyboardType="numeric"
-                  placeholder="500"
-                  suffix="Nm"
-                />
+
+              <View style={styles.typeGrid}>
+                {vehicleBodyTypes.map((type) => {
+                  const selected = bodyType === type;
+                  return (
+                    <Pressable
+                      key={type}
+                      onPress={() => setBodyType(type)}
+                      style={({ pressed }) => [
+                        styles.typeChip,
+                        selected && styles.typeChipSelected,
+                        pressed && styles.pressed,
+                      ]}
+                    >
+                      <Text style={[styles.typeChipText, selected && styles.typeChipTextSelected]}>{type}</Text>
+                    </Pressable>
+                  );
+                })}
               </View>
             </View>
           </View>
 
           {error ? <Text style={styles.errorText}>{error}</Text> : null}
+
+          <View style={styles.previewCard}>
+            <Text style={styles.previewTitle}>Como o MVP calcula?</Text>
+            <Text style={styles.previewDescription}>
+              Nesta fase, o Rivalis associa o modelo/tipo a um preset técnico demonstrativo e filtra concorrentes do mesmo segmento para exibir todos os resultados.
+            </Text>
+          </View>
 
           <View style={styles.actionsRow}>
             <View style={styles.resetButtonWrapper}>
@@ -137,7 +146,7 @@ export function VehicleSearchSheet({ bottomSheetRef, onSubmit }: VehicleSearchSh
               </View>
             </View>
             <View style={styles.submitButtonWrapper}>
-              <AnimatedButton label="Comparar Concorrentes" onPress={handleSubmit} />
+              <AnimatedButton label="Ver Resultados" onPress={handleSubmit} pulse={false} />
             </View>
           </View>
         </LinearGradient>
@@ -212,18 +221,77 @@ const styles = StyleSheet.create({
     marginTop: spacing.xl,
     gap: spacing.lg,
   },
-  doubleGrid: {
-    flexDirection: 'row',
+  typeArea: {
     gap: spacing.md,
   },
-  doubleGridItem: {
-    flex: 1,
+  typeLabelRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.sm,
+  },
+  typeLabel: {
+    fontFamily: fonts.bodyBold,
+    color: colors.textSecondary,
+    fontSize: 12,
+    letterSpacing: 0.7,
+    textTransform: 'uppercase',
+  },
+  typeGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: spacing.sm,
+  },
+  typeChip: {
+    paddingHorizontal: spacing.lg,
+    minHeight: 42,
+    borderRadius: radius.pill,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: colors.glass,
+    borderWidth: 1,
+    borderColor: colors.border,
+  },
+  typeChipSelected: {
+    backgroundColor: colors.accentSoft,
+    borderColor: 'rgba(0,174,239,0.48)',
+  },
+  typeChipText: {
+    fontFamily: fonts.bodySemiBold,
+    color: colors.textSecondary,
+    fontSize: 13,
+  },
+  typeChipTextSelected: {
+    color: colors.accent,
+  },
+  pressed: {
+    opacity: 0.78,
+    transform: [{ scale: 0.98 }],
   },
   errorText: {
     marginTop: spacing.lg,
     fontFamily: fonts.bodySemiBold,
     color: colors.warning,
     fontSize: 13,
+  },
+  previewCard: {
+    marginTop: spacing.xl,
+    padding: spacing.lg,
+    borderRadius: radius.md,
+    backgroundColor: colors.glass,
+    borderWidth: 1,
+    borderColor: colors.border,
+  },
+  previewTitle: {
+    fontFamily: fonts.heading,
+    color: colors.textPrimary,
+    fontSize: 17,
+  },
+  previewDescription: {
+    marginTop: spacing.sm,
+    fontFamily: fonts.bodyMedium,
+    color: colors.textSecondary,
+    fontSize: 13,
+    lineHeight: 20,
   },
   actionsRow: {
     marginTop: spacing.xl,

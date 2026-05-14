@@ -1,8 +1,7 @@
 import React from 'react';
-import { Pressable, Text, StyleSheet, ViewStyle } from 'react-native';
+import { Pressable, Text, StyleSheet, View, ViewStyle } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import * as Haptics from 'expo-haptics';
-import { MotiView } from 'moti';
 import { ChevronRight } from 'lucide-react-native';
 
 import { colors, fonts, gradients, radius, shadows, spacing } from '../theme';
@@ -11,46 +10,30 @@ type AnimatedButtonProps = {
   label: string;
   onPress: () => void;
   style?: ViewStyle;
-  pulse?: boolean;
 };
 
-export function AnimatedButton({ label, onPress, style, pulse = true }: AnimatedButtonProps) {
+export function AnimatedButton({ label, onPress, style }: AnimatedButtonProps) {
   const handlePress = async () => {
     await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
     onPress();
   };
 
   return (
-    <MotiView
-      from={{ scale: 0.98, opacity: 0.92 }}
-      animate={{ scale: pulse ? 1.025 : 1, opacity: 1 }}
-      transition={{
-        type: 'timing',
-        duration: 1400,
-        loop: pulse,
-        repeatReverse: true,
-      }}
-      style={[styles.motionWrapper, style]}
-    >
+    <View style={[styles.wrapper, style]}>
       <Pressable onPress={handlePress} style={({ pressed }) => [styles.pressable, pressed && styles.pressed]}>
         <LinearGradient colors={gradients.primaryButton} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={styles.gradient}>
           <Text style={styles.label}>{label}</Text>
-          <MotiView
-            from={{ translateX: 0 }}
-            animate={{ translateX: 4 }}
-            transition={{ type: 'timing', duration: 700, loop: true, repeatReverse: true }}
-            style={styles.iconBox}
-          >
+          <View style={styles.iconBox}>
             <ChevronRight size={20} color={colors.textPrimary} strokeWidth={2.8} />
-          </MotiView>
+          </View>
         </LinearGradient>
       </Pressable>
-    </MotiView>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  motionWrapper: {
+  wrapper: {
     borderRadius: radius.pill,
     ...shadows.primaryGlow,
   },
