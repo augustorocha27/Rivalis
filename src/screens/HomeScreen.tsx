@@ -25,7 +25,7 @@ import {
 import type { ReferenceVehicle } from '../@types/car';
 import type { RootStackParamList } from '../@types/navigation';
 import { AnimatedButton } from '../components/AnimatedButton';
-import { LoginModal } from '../components/LoginModal';
+import { LoginModal, type AuthenticatedUser } from '../components/LoginModal';
 import { VehicleSearchSheet } from '../components/VehicleSearchSheet';
 import { colors, fonts, gradients, radius, shadows, spacing } from '../theme';
 
@@ -36,6 +36,7 @@ export function HomeScreen() {
   const bottomSheetRef = useRef<BottomSheetModal>(null);
   const scrollRef = useRef<ScrollView>(null);
   const [loginVisible, setLoginVisible] = useState(false);
+  const [authenticatedUser, setAuthenticatedUser] = useState<AuthenticatedUser | null>(null);
 
   const navLinks = useMemo(
     () => [
@@ -116,10 +117,20 @@ export function HomeScreen() {
               <Pressable onPress={openSearch} style={({ pressed }) => [styles.navCta, pressed && styles.pressed]}>
                 <Text style={styles.navCtaText}>Comparar</Text>
               </Pressable>
-              <Pressable onPress={() => setLoginVisible(true)} style={({ pressed }) => [styles.loginButton, pressed && styles.pressed]}>
-                <LockKeyhole size={14} color={colors.silver} strokeWidth={2.4} />
-                <Text style={styles.loginButtonText}>Login</Text>
-              </Pressable>
+              {authenticatedUser ? (
+                <View style={styles.userBadge}>
+                  <ShieldCheck size={15} color={colors.accent} strokeWidth={2.5} />
+                  <View>
+                    <Text style={styles.userBadgeName}>{authenticatedUser.name}</Text>
+                    <Text style={styles.userBadgeStatus}>Autenticado</Text>
+                  </View>
+                </View>
+              ) : (
+                <Pressable onPress={() => setLoginVisible(true)} style={({ pressed }) => [styles.loginButton, pressed && styles.pressed]}>
+                  <LockKeyhole size={14} color={colors.silver} strokeWidth={2.4} />
+                  <Text style={styles.loginButtonText}>Login</Text>
+                </Pressable>
+              )}
             </ScrollView>
           </View>
 
@@ -142,7 +153,7 @@ export function HomeScreen() {
                 </Text>
 
                 <View style={styles.heroActions}>
-                  <AnimatedButton label="Comparar Concorrentes" onPress={openSearch} pulse={false} />
+                  <AnimatedButton label="Comparar Concorrentes" onPress={openSearch} />
                   <Pressable onPress={() => navigation.navigate('Fluxo')} style={({ pressed }) => [styles.secondaryCta, pressed && styles.pressed]}>
                     <Text style={styles.secondaryCtaText}>Ver fluxo de uso</Text>
                     <ChevronRight size={17} color={colors.accent} />
@@ -244,7 +255,7 @@ export function HomeScreen() {
                 O formulário foi simplificado para Modelo, Ano e Tipo. A partir disso, o Rivalis filtra concorrentes e apresenta cards comparativos com ranking, potência, torque e leitura de vantagem competitiva.
               </Text>
               <View style={styles.compareActions}>
-                <AnimatedButton label="Comparar Concorrentes" onPress={openSearch} pulse={false} />
+                <AnimatedButton label="Comparar Concorrentes" onPress={openSearch} />
                 <Pressable onPress={() => navigation.navigate('FAQ')} style={({ pressed }) => [styles.faqShortcut, pressed && styles.pressed]}>
                   <FileQuestion size={17} color={colors.accent} strokeWidth={2.4} />
                   <Text style={styles.faqShortcutText}>Abrir FAQ</Text>
@@ -326,7 +337,7 @@ export function HomeScreen() {
       </LinearGradient>
 
       <VehicleSearchSheet bottomSheetRef={bottomSheetRef} onSubmit={handleSearchSubmit} />
-      <LoginModal visible={loginVisible} onClose={() => setLoginVisible(false)} />
+      <LoginModal visible={loginVisible} onClose={() => setLoginVisible(false)} onAuthenticated={setAuthenticatedUser} />
     </View>
   );
 }
@@ -376,6 +387,9 @@ const styles = StyleSheet.create({
   navCtaText: { fontFamily: fonts.bodyBold, color: colors.textPrimary, fontSize: 12, textTransform: 'uppercase', letterSpacing: 0.4 },
   loginButton: { minHeight: 38, paddingHorizontal: spacing.lg, borderRadius: radius.pill, alignItems: 'center', justifyContent: 'center', flexDirection: 'row', gap: spacing.sm, backgroundColor: colors.glass, borderWidth: 1, borderColor: colors.border },
   loginButtonText: { fontFamily: fonts.bodyBold, color: colors.silver, fontSize: 12, textTransform: 'uppercase', letterSpacing: 0.4 },
+  userBadge: { minHeight: 42, paddingHorizontal: spacing.lg, borderRadius: radius.pill, alignItems: 'center', justifyContent: 'center', flexDirection: 'row', gap: spacing.sm, backgroundColor: colors.surfaceElevated, borderWidth: 1, borderColor: 'rgba(0,174,239,0.34)' },
+  userBadgeName: { fontFamily: fonts.bodyBold, color: colors.textPrimary, fontSize: 12, maxWidth: 150 },
+  userBadgeStatus: { fontFamily: fonts.bodyMedium, color: colors.accent, fontSize: 10, marginTop: 1, textTransform: 'uppercase', letterSpacing: 0.5 },
   pressed: { opacity: 0.78, transform: [{ scale: 0.98 }] },
   content: { paddingHorizontal: spacing.lg, paddingBottom: spacing.huge },
   heroSection: { width: '100%', maxWidth: 1180, alignSelf: 'center', flexDirection: 'row', gap: spacing.xxl, alignItems: 'center', paddingTop: spacing.huge, paddingBottom: spacing.huge, flexWrap: 'wrap' },
