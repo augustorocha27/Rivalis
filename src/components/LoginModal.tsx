@@ -128,7 +128,7 @@ export function LoginModal({ visible, onClose, onAuthenticated }: LoginModalProp
               <TextInput
                 value={name}
                 onChangeText={setName}
-                placeholder="Ex: Augusto Rocha"
+                placeholder="Ex: Nome Sobrenome"
                 placeholderTextColor={colors.textMuted}
                 autoCapitalize="words"
                 style={styles.input}
