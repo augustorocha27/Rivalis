@@ -128,6 +128,7 @@ const styles = StyleSheet.create({
   },
   gridPhone: {
     flexDirection: 'column',
+    alignItems: 'stretch',
   },
   faqList: {
     gap: spacing.md,

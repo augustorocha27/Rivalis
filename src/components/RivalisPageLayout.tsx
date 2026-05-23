@@ -53,14 +53,14 @@ export function RivalisPageLayout({ kicker, title, description, children, showBa
 
             <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={[styles.navLinks, isMobile && styles.navLinksMobile]}>
               {pageLinks.map((item) => (
-                <Pressable key={item.route} onPress={() => navigation.navigate(item.route)} style={({ pressed }) => [styles.navLink, pressed && styles.pressed]}>
-                  <Text style={styles.navLinkText}>{item.label}</Text>
+                <Pressable key={item.route} onPress={() => navigation.navigate(item.route)} style={({ pressed }) => [styles.navLink, isPhone && styles.navLinkPhone, pressed && styles.pressed]}>
+                  <Text style={[styles.navLinkText, isPhone && styles.navLinkTextPhone]}>{item.label}</Text>
                 </Pressable>
               ))}
-              <Pressable onPress={() => navigation.navigate('Home')} style={({ pressed }) => [styles.navCta, pressed && styles.pressed]}>
-                <Text style={styles.navCtaText}>Comparar agora</Text>
+              <Pressable onPress={() => navigation.navigate('Home')} style={({ pressed }) => [styles.navCta, isPhone && styles.navCtaPhone, pressed && styles.pressed]}>
+                <Text style={[styles.navCtaText, isPhone && styles.navCtaTextPhone]}>{isPhone ? 'Comparar' : 'Comparar agora'}</Text>
               </Pressable>
-              <Pressable onPress={() => setLoginVisible(true)} style={({ pressed }) => [styles.loginButton, pressed && styles.pressed]}>
+              <Pressable onPress={() => setLoginVisible(true)} style={({ pressed }) => [styles.loginButton, isPhone && styles.loginButtonPhone, pressed && styles.pressed]}>
                 <LockKeyhole size={14} color={colors.silver} strokeWidth={2.4} />
                 <Text style={styles.loginButtonText}>Login</Text>
               </Pressable>
@@ -86,7 +86,7 @@ export function RivalisPageLayout({ kicker, title, description, children, showBa
             <LinearGradient colors={gradients.premiumPanel} style={[styles.footerShell, isPhone && styles.footerShellPhone]}>
               <View style={[styles.footerTop, isMobile && styles.footerTopMobile]}>
                 <View style={[styles.footerBrandBlock, isMobile && styles.fullWidth]}>
-                  <View style={styles.footerLogoRow}>
+                  <View style={[styles.footerLogoRow, isPhone && styles.footerLogoRowPhone]}>
                     <View style={styles.footerLogoMark}>
                       <Radar size={22} color={colors.accent} strokeWidth={2.7} />
                     </View>
@@ -108,7 +108,7 @@ export function RivalisPageLayout({ kicker, title, description, children, showBa
                 </View>
 
                 <View style={[styles.footerGrid, isMobile && styles.footerGridMobile]}>
-                  <View style={[styles.footerColumn, isPhone && styles.fullWidth]}>
+                  <View style={[styles.footerColumn, isMobile && styles.footerColumnMobile]}>
                     <Text style={styles.footerColumnTitle}>Navegação</Text>
                     <Pressable onPress={() => navigation.navigate('Home')}><Text style={styles.footerLink}>Página inicial</Text></Pressable>
                     <Pressable onPress={() => navigation.navigate('UsoInterno')}><Text style={styles.footerLink}>Uso interno</Text></Pressable>
@@ -117,7 +117,7 @@ export function RivalisPageLayout({ kicker, title, description, children, showBa
                     <Pressable onPress={() => navigation.navigate('FAQ')}><Text style={styles.footerLink}>FAQ</Text></Pressable>
                   </View>
 
-                  <View style={[styles.footerColumn, isPhone && styles.fullWidth]}>
+                  <View style={[styles.footerColumn, isMobile && styles.footerColumnMobile]}>
                     <Text style={styles.footerColumnTitle}>Aplicações</Text>
                     <Text style={styles.footerMutedLink}>Treinamento de produto</Text>
                     <Text style={styles.footerMutedLink}>Benchmarking competitivo</Text>
@@ -125,7 +125,7 @@ export function RivalisPageLayout({ kicker, title, description, children, showBa
                     <Text style={styles.footerMutedLink}>Consulta técnica rápida</Text>
                   </View>
 
-                  <View style={[styles.footerColumn, isPhone && styles.fullWidth]}>
+                  <View style={[styles.footerColumn, isMobile && styles.footerColumnMobile]}>
                     <Text style={styles.footerColumnTitle}>Links</Text>
                     <Pressable onPress={() => openExternal('https://instagram.com/rivalis.app')} style={styles.externalLinkRow}>
                       <Text style={styles.footerLink}>Instagram</Text>
@@ -226,10 +226,15 @@ const styles = StyleSheet.create({
   navLinks: { flexGrow: 1, alignItems: 'center', justifyContent: 'flex-end', gap: spacing.sm, paddingLeft: spacing.md, paddingRight: spacing.md },
   navLinksMobile: { justifyContent: 'flex-start', paddingLeft: 0, paddingRight: spacing.lg, paddingVertical: spacing.xs },
   navLink: { minHeight: 38, paddingHorizontal: spacing.md, borderRadius: radius.pill, alignItems: 'center', justifyContent: 'center' },
+  navLinkPhone: { minHeight: 34, paddingHorizontal: spacing.sm },
   navLinkText: { fontFamily: fonts.bodySemiBold, color: colors.textSecondary, fontSize: 12 },
+  navLinkTextPhone: { fontSize: 11 },
   navCta: { minHeight: 38, paddingHorizontal: spacing.lg, borderRadius: radius.pill, alignItems: 'center', justifyContent: 'center', backgroundColor: colors.accent, ...shadows.cyanGlow },
+  navCtaPhone: { minHeight: 36, paddingHorizontal: spacing.md },
   navCtaText: { fontFamily: fonts.bodyBold, color: colors.textPrimary, fontSize: 12, textTransform: 'uppercase', letterSpacing: 0.4 },
+  navCtaTextPhone: { fontSize: 11, letterSpacing: 0.2 },
   loginButton: { minHeight: 38, paddingHorizontal: spacing.lg, borderRadius: radius.pill, alignItems: 'center', justifyContent: 'center', flexDirection: 'row', gap: spacing.sm, backgroundColor: colors.glass, borderWidth: 1, borderColor: colors.border },
+  loginButtonPhone: { paddingHorizontal: spacing.md, minHeight: 36 },
   loginButtonText: { fontFamily: fonts.bodyBold, color: colors.silver, fontSize: 12, textTransform: 'uppercase', letterSpacing: 0.4 },
   pressed: { opacity: 0.78, transform: [{ scale: 0.98 }] },
   content: { paddingBottom: spacing.huge },
@@ -250,7 +255,7 @@ const styles = StyleSheet.create({
   sectionChildren: { marginTop: spacing.xl },
   infoCard: { flex: 1, minWidth: 250, borderRadius: radius.lg, padding: spacing.xl, borderWidth: 1, borderColor: colors.border },
   infoCardPhone: { padding: spacing.lg },
-  fullWidth: { width: '100%', minWidth: 0, flex: 0 },
+  fullWidth: { width: '100%', maxWidth: '100%', minWidth: 0, flexBasis: '100%', flexGrow: 0, flexShrink: 0 },
   cardIconBox: { width: 52, height: 52, borderRadius: 18, alignItems: 'center', justifyContent: 'center', backgroundColor: colors.accentSoft, marginBottom: spacing.lg },
   infoCardTitle: { fontFamily: fonts.heading, color: colors.textPrimary, fontSize: 20, lineHeight: 26 },
   infoCardDescription: { marginTop: spacing.sm, fontFamily: fonts.bodyMedium, color: colors.textSecondary, fontSize: 14, lineHeight: 22 },
@@ -261,18 +266,20 @@ const styles = StyleSheet.create({
   footerShellPhone: { padding: spacing.lg, borderRadius: radius.lg },
   footerTop: { flexDirection: 'row', flexWrap: 'wrap', gap: spacing.xxl },
   footerTopMobile: { flexDirection: 'column', gap: spacing.xl },
-  footerBrandBlock: { flex: 1, minWidth: 280 },
+  footerBrandBlock: { flex: 1, minWidth: 280, maxWidth: '100%' },
   footerLogoRow: { flexDirection: 'row', alignItems: 'center', gap: spacing.md },
+  footerLogoRowPhone: { alignItems: 'flex-start' },
   footerLogoMark: { width: 48, height: 48, borderRadius: 16, alignItems: 'center', justifyContent: 'center', backgroundColor: colors.accentSoft, borderWidth: 1, borderColor: 'rgba(0,174,239,0.36)' },
   footerBrand: { fontFamily: fonts.headingBold, color: colors.textPrimary, fontSize: 18, letterSpacing: 3 },
   footerSubBrand: { fontFamily: fonts.bodyMedium, color: colors.textMuted, fontSize: 11, marginTop: 2 },
-  footerText: { marginTop: spacing.lg, fontFamily: fonts.bodyMedium, color: colors.textSecondary, fontSize: 14, lineHeight: 23, maxWidth: 460 },
+  footerText: { marginTop: spacing.lg, fontFamily: fonts.bodyMedium, color: colors.textSecondary, fontSize: 14, lineHeight: 23, maxWidth: 460, flexShrink: 1 },
   footerBadges: { marginTop: spacing.lg, flexDirection: 'row', flexWrap: 'wrap', gap: spacing.sm },
   footerBadge: { paddingVertical: spacing.sm, paddingHorizontal: spacing.md, borderRadius: radius.pill, backgroundColor: colors.accentSoft, borderWidth: 1, borderColor: 'rgba(0,174,239,0.28)' },
   footerBadgeText: { fontFamily: fonts.bodyBold, color: colors.accent, fontSize: 11 },
-  footerGrid: { flex: 1.2, minWidth: 320, flexDirection: 'row', flexWrap: 'wrap', gap: spacing.xl },
-  footerGridMobile: { width: '100%', minWidth: 0, flex: 0, gap: spacing.lg },
+  footerGrid: { flex: 1.2, minWidth: 320, flexDirection: 'row', flexWrap: 'wrap', alignItems: 'flex-start', gap: spacing.xl },
+  footerGridMobile: { width: '100%', maxWidth: '100%', minWidth: 0, flexBasis: '100%', flexGrow: 0, flexShrink: 0, flexDirection: 'column', alignItems: 'stretch', gap: spacing.lg },
   footerColumn: { minWidth: 150, gap: spacing.sm },
+  footerColumnMobile: { width: '100%', maxWidth: '100%', minWidth: 0 },
   footerColumnTitle: { fontFamily: fonts.bodyBold, color: colors.textPrimary, fontSize: 13, textTransform: 'uppercase', letterSpacing: 1, marginBottom: spacing.sm },
   footerLink: { fontFamily: fonts.bodySemiBold, color: colors.accent, fontSize: 13, lineHeight: 22 },
   footerMutedLink: { fontFamily: fonts.bodyMedium, color: colors.textSecondary, fontSize: 13, lineHeight: 22 },

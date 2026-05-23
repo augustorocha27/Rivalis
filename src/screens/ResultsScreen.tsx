@@ -223,7 +223,7 @@ const styles = StyleSheet.create({
   heroIconBox: { width: 64, height: 64, borderRadius: 22, alignItems: 'center', justifyContent: 'center', backgroundColor: colors.accentSoft, borderWidth: 1, borderColor: 'rgba(0,174,239,0.34)' },
   heroIconBoxPhone: { width: 54, height: 54, borderRadius: 18 },
   heroTitleBlock: { flex: 1, minWidth: 260 },
-  fullWidth: { width: '100%', minWidth: 0, flex: 0 },
+  fullWidth: { width: '100%', maxWidth: '100%', minWidth: 0, flexBasis: '100%', flexGrow: 0, flexShrink: 0 },
   kicker: { fontFamily: fonts.bodyBold, color: colors.accent, fontSize: 12, textTransform: 'uppercase', letterSpacing: 1.5 },
   title: { marginTop: spacing.sm, fontFamily: fonts.headingBold, color: colors.textPrimary, fontSize: 38, lineHeight: 46, letterSpacing: -1.2 },
   titleMobile: { fontSize: 32, lineHeight: 39 },

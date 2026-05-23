@@ -96,7 +96,7 @@ export function InternalUseScreen() {
 }
 
 const styles = StyleSheet.create({
-  fullWidth: { width: '100%', minWidth: 0, flex: 0 },
+  fullWidth: { width: '100%', maxWidth: '100%', minWidth: 0, flexBasis: '100%', flexGrow: 0, flexShrink: 0 },
   featurePanel: {
     borderRadius: radius.xl,
     padding: spacing.xxl,
@@ -125,6 +125,7 @@ const styles = StyleSheet.create({
   featureCopy: {
     flex: 1,
     minWidth: 260,
+    maxWidth: '100%',
   },
   featureTitle: {
     fontFamily: fonts.headingBold,
@@ -150,6 +151,7 @@ const styles = StyleSheet.create({
   },
   gridPhone: {
     flexDirection: 'column',
+    alignItems: 'stretch',
   },
   bulletPanel: {
     borderRadius: radius.xl,

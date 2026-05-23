@@ -4,9 +4,9 @@ import { useWindowDimensions } from 'react-native';
 import { spacing } from './index';
 
 export const breakpoints = {
-  phone: 480,
-  tablet: 768,
-  desktop: 1024,
+  phone: 600,
+  tablet: 900,
+  desktop: 1180,
 };
 
 export function useResponsive() {
@@ -25,7 +25,7 @@ export function useResponsive() {
       isMobile,
       isTablet,
       isDesktop,
-      pagePadding: isPhone ? spacing.md : isMobile ? spacing.lg : spacing.xl,
+      pagePadding: isPhone ? spacing.md : isMobile ? spacing.lg : spacing.xxl,
       cardPadding: isPhone ? spacing.lg : spacing.xl,
       sectionGap: isPhone ? spacing.xl : spacing.huge,
       contentMaxWidth: 1180,

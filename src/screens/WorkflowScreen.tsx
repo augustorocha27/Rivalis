@@ -104,7 +104,7 @@ export function WorkflowScreen() {
 }
 
 const styles = StyleSheet.create({
-  fullWidth: { width: '100%', minWidth: 0, flex: 0 },
+  fullWidth: { width: '100%', maxWidth: '100%', minWidth: 0, flexBasis: '100%', flexGrow: 0, flexShrink: 0 },
   timeline: {
     gap: spacing.lg,
   },
@@ -149,6 +149,7 @@ const styles = StyleSheet.create({
   stepCopy: {
     flex: 1,
     minWidth: 260,
+    maxWidth: '100%',
   },
   stepTitle: {
     fontFamily: fonts.heading,
@@ -179,5 +180,6 @@ const styles = StyleSheet.create({
   },
   gridPhone: {
     flexDirection: 'column',
+    alignItems: 'stretch',
   },
 });

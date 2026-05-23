@@ -113,7 +113,7 @@ export function AnalysesScreen() {
 }
 
 const styles = StyleSheet.create({
-  fullWidth: { width: '100%', minWidth: 0, flex: 0 },
+  fullWidth: { width: '100%', maxWidth: '100%', minWidth: 0, flexBasis: '100%', flexGrow: 0, flexShrink: 0 },
   grid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
@@ -122,6 +122,7 @@ const styles = StyleSheet.create({
   indicatorCard: {
     flex: 1,
     minWidth: 250,
+    maxWidth: '100%',
     borderRadius: radius.lg,
     padding: spacing.xl,
     borderWidth: 1,
@@ -180,6 +181,7 @@ const styles = StyleSheet.create({
   visualColumn: {
     flex: 1,
     minWidth: 240,
+    maxWidth: '100%',
     padding: spacing.lg,
     borderRadius: radius.lg,
     backgroundColor: colors.glass,
@@ -211,5 +213,6 @@ const styles = StyleSheet.create({
   },
   gridPhone: {
     flexDirection: 'column',
+    alignItems: 'stretch',
   },
 });
