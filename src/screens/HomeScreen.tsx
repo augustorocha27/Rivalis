@@ -37,6 +37,8 @@ export function HomeScreen() {
   const scrollRef = useRef<ScrollView>(null);
   const [loginVisible, setLoginVisible] = useState(false);
   const [authenticatedUser, setAuthenticatedUser] = useState<AuthenticatedUser | null>(null);
+  const [pendingSearchAfterLogin, setPendingSearchAfterLogin] = useState(false);
+  const [authNotice, setAuthNotice] = useState('');
 
   const navLinks = useMemo(
     () => [
@@ -67,7 +69,7 @@ export function HomeScreen() {
       },
       {
         title: 'Fluxo',
-        description: 'Entenda o caminho da pesquisa: modelo, ano, tipo e resultados competitivos.',
+        description: 'Entenda o caminho da pesquisa: marca, modelo, ano e resultados competitivos.',
         icon: Target,
         route: 'Fluxo' as keyof RootStackParamList,
       },
@@ -82,10 +84,41 @@ export function HomeScreen() {
   );
 
   const openSearch = () => {
+    if (!authenticatedUser) {
+      setAuthNotice('Faça login para liberar a pesquisa de concorrentes.');
+      setPendingSearchAfterLogin(true);
+      setLoginVisible(true);
+      return;
+    }
+
+    setAuthNotice('');
     bottomSheetRef.current?.present();
   };
 
+  const handleAuthenticated = (user: AuthenticatedUser) => {
+    setAuthenticatedUser(user);
+
+    if (pendingSearchAfterLogin) {
+      setPendingSearchAfterLogin(false);
+      setAuthNotice('Login confirmado. A pesquisa foi liberada para este usuário.');
+
+      setTimeout(() => {
+        bottomSheetRef.current?.present();
+      }, 700);
+    } else {
+      setAuthNotice('');
+    }
+  };
+
   const handleSearchSubmit = (reference: ReferenceVehicle) => {
+    if (!authenticatedUser) {
+      bottomSheetRef.current?.dismiss();
+      setAuthNotice('Autentique-se antes de iniciar uma pesquisa.');
+      setPendingSearchAfterLogin(true);
+      setLoginVisible(true);
+      return;
+    }
+
     navigation.navigate('Resultados', { reference });
   };
 
@@ -149,7 +182,7 @@ export function HomeScreen() {
 
                 <Text style={styles.heroTitle}>Compare modelos Ford contra concorrentes em uma tela de trabalho.</Text>
                 <Text style={styles.heroSubtitle}>
-                  O Rivalis ajuda colaboradores a pesquisarem um modelo Ford por modelo, ano e tipo para visualizar resultados comparativos contra concorrentes do mesmo segmento.
+                  O Rivalis ajuda colaboradores a pesquisarem veículos por marca, modelo e ano para visualizar resultados comparativos contra concorrentes do mesmo segmento.
                 </Text>
 
                 <View style={styles.heroActions}>
@@ -161,6 +194,13 @@ export function HomeScreen() {
                 </View>
 
                 <Text style={styles.microcopy}>Feito para consulta, benchmarking e preparação de argumentos internos — não para jornada de compra do cliente final.</Text>
+
+                {authNotice ? (
+                  <View style={styles.authNotice}>
+                    <LockKeyhole size={16} color={colors.accent} strokeWidth={2.5} />
+                    <Text style={styles.authNoticeText}>{authNotice}</Text>
+                  </View>
+                ) : null}
 
                 <View style={styles.statsGrid}>
                   {stats.map((stat) => {
@@ -206,7 +246,7 @@ export function HomeScreen() {
                     </View>
                     <View style={styles.searchPreviewRow}>
                       <Zap size={20} color={colors.accent} />
-                      <Text style={styles.searchPreviewText}>Tipo: Picape</Text>
+                      <Text style={styles.searchPreviewText}>Marca: Ford</Text>
                     </View>
                   </View>
 
@@ -252,7 +292,7 @@ export function HomeScreen() {
               <Text style={styles.compareKicker}>Resultados em página dedicada</Text>
               <Text style={styles.compareTitle}>Pesquise um modelo Ford e abra uma tela completa com todos os concorrentes.</Text>
               <Text style={styles.compareDescription}>
-                O formulário foi simplificado para Modelo, Ano e Tipo. A partir disso, o Rivalis filtra concorrentes e apresenta cards comparativos com ranking, potência, torque e leitura de vantagem competitiva.
+                O formulário foi simplificado para Marca, Modelo e Ano. A partir disso, o Rivalis filtra concorrentes e apresenta cards comparativos com ranking, potência, torque e leitura de vantagem competitiva. A pesquisa só é liberada após login demonstrativo.
               </Text>
               <View style={styles.compareActions}>
                 <AnimatedButton label="Comparar Concorrentes" onPress={openSearch} />
@@ -337,7 +377,7 @@ export function HomeScreen() {
       </LinearGradient>
 
       <VehicleSearchSheet bottomSheetRef={bottomSheetRef} onSubmit={handleSearchSubmit} />
-      <LoginModal visible={loginVisible} onClose={() => setLoginVisible(false)} onAuthenticated={setAuthenticatedUser} />
+      <LoginModal visible={loginVisible} onClose={() => setLoginVisible(false)} onAuthenticated={handleAuthenticated} />
     </View>
   );
 }
@@ -402,6 +442,8 @@ const styles = StyleSheet.create({
   secondaryCta: { minHeight: 56, paddingHorizontal: spacing.xl, borderRadius: radius.pill, borderWidth: 1, borderColor: colors.border, backgroundColor: colors.glass, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: spacing.sm },
   secondaryCtaText: { fontFamily: fonts.bodyBold, color: colors.silver, fontSize: 14 },
   microcopy: { marginTop: spacing.lg, fontFamily: fonts.bodyMedium, color: colors.textMuted, fontSize: 13, lineHeight: 20, maxWidth: 680 },
+  authNotice: { marginTop: spacing.lg, paddingHorizontal: spacing.md, paddingVertical: spacing.md, borderRadius: radius.md, backgroundColor: colors.backgroundSoft, borderWidth: 1, borderColor: 'rgba(0,174,239,0.34)', flexDirection: 'row', alignItems: 'center', gap: spacing.sm, maxWidth: 680 },
+  authNoticeText: { flex: 1, fontFamily: fonts.bodySemiBold, color: colors.silver, fontSize: 13, lineHeight: 20 },
   statsGrid: { marginTop: spacing.xxl, flexDirection: 'row', flexWrap: 'wrap', gap: spacing.md },
   statCard: { flexGrow: 1, minWidth: 150, borderRadius: radius.lg, padding: spacing.lg, borderWidth: 1, borderColor: colors.border },
   statValue: { marginTop: spacing.md, fontFamily: fonts.headingBold, color: colors.textPrimary, fontSize: 22 },

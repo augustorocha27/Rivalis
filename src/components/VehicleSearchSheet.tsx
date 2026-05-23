@@ -1,5 +1,5 @@
 import React, { RefObject, useMemo, useState } from 'react';
-import { Keyboard, Pressable, StyleSheet, Text, View } from 'react-native';
+import { Keyboard, StyleSheet, Text, View } from 'react-native';
 import {
   BottomSheetBackdrop,
   BottomSheetModal,
@@ -7,10 +7,10 @@ import {
 } from '@gorhom/bottom-sheet';
 import { LinearGradient } from 'expo-linear-gradient';
 import * as Haptics from 'expo-haptics';
-import { CalendarDays, Car, RotateCcw, Search, Shapes } from 'lucide-react-native';
+import { Building2, CalendarDays, Car, RotateCcw, Search } from 'lucide-react-native';
 
-import type { ReferenceVehicle, VehicleBodyType } from '../@types/car';
-import { buildFordReference, vehicleBodyTypes } from '../data/fordReferences';
+import type { ReferenceVehicle } from '../@types/car';
+import { buildVehicleReference } from '../data/fordReferences';
 import { colors, fonts, gradients, radius, shadows, spacing } from '../theme';
 import { AnimatedButton } from './AnimatedButton';
 import { RivalisInput } from './RivalisInput';
@@ -21,25 +21,25 @@ type VehicleSearchSheetProps = {
 };
 
 export function VehicleSearchSheet({ bottomSheetRef, onSubmit }: VehicleSearchSheetProps) {
-  const snapPoints = useMemo(() => ['66%', '88%'], []);
-  const [model, setModel] = useState('Ford Ranger');
+  const snapPoints = useMemo(() => ['58%', '82%'], []);
+  const [brand, setBrand] = useState('Ford');
+  const [model, setModel] = useState('Ranger');
   const [year, setYear] = useState('2025');
-  const [bodyType, setBodyType] = useState<VehicleBodyType>('Picape');
   const [error, setError] = useState('');
 
   const handleReset = async () => {
     await Haptics.selectionAsync();
-    setModel('Ford Ranger');
+    setBrand('Ford');
+    setModel('Ranger');
     setYear('2025');
-    setBodyType('Picape');
     setError('');
   };
 
   const handleSubmit = async () => {
     const parsedYear = Number(year.replace(/[^0-9]/g, ''));
 
-    if (!model.trim() || !parsedYear || parsedYear < 1950 || parsedYear > 2100) {
-      setError('Preencha modelo e ano com valores válidos. Exemplo: Ford Ranger, 2025.');
+    if (!brand.trim() || !model.trim() || !parsedYear || parsedYear < 1950 || parsedYear > 2100) {
+      setError('Preencha marca, modelo e ano com valores válidos. Exemplo: Ford, Ranger, 2025.');
       await Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
       return;
     }
@@ -47,7 +47,7 @@ export function VehicleSearchSheet({ bottomSheetRef, onSubmit }: VehicleSearchSh
     setError('');
     Keyboard.dismiss();
     await Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-    onSubmit(buildFordReference(model, year, bodyType));
+    onSubmit(buildVehicleReference(brand, model, year));
     bottomSheetRef.current?.dismiss();
   };
 
@@ -78,16 +78,26 @@ export function VehicleSearchSheet({ bottomSheetRef, onSubmit }: VehicleSearchSh
           </View>
 
           <Text style={styles.description}>
-            Informe apenas modelo, ano e tipo do veículo Ford. O MVP usa presets demonstrativos para gerar a análise competitiva e exibir os resultados em uma página dedicada.
+            Informe marca, modelo e ano do veículo de referência. O Rivalis identifica automaticamente o segmento mais provável e exibe os concorrentes encontrados em uma página dedicada.
           </Text>
 
           <View style={styles.formArea}>
+            <RivalisInput
+              label="Marca"
+              icon={Building2}
+              value={brand}
+              onChangeText={setBrand}
+              placeholder="Ex: Ford"
+              autoCapitalize="words"
+              returnKeyType="next"
+            />
+
             <RivalisInput
               label="Modelo"
               icon={Car}
               value={model}
               onChangeText={setModel}
-              placeholder="Ex: Ford Ranger"
+              placeholder="Ex: Ranger"
               autoCapitalize="words"
               returnKeyType="next"
             />
@@ -101,32 +111,6 @@ export function VehicleSearchSheet({ bottomSheetRef, onSubmit }: VehicleSearchSh
               placeholder="2025"
               maxLength={4}
             />
-
-            <View style={styles.typeArea}>
-              <View style={styles.typeLabelRow}>
-                <Shapes size={17} color={colors.accent} strokeWidth={2.4} />
-                <Text style={styles.typeLabel}>Tipo</Text>
-              </View>
-
-              <View style={styles.typeGrid}>
-                {vehicleBodyTypes.map((type) => {
-                  const selected = bodyType === type;
-                  return (
-                    <Pressable
-                      key={type}
-                      onPress={() => setBodyType(type)}
-                      style={({ pressed }) => [
-                        styles.typeChip,
-                        selected && styles.typeChipSelected,
-                        pressed && styles.pressed,
-                      ]}
-                    >
-                      <Text style={[styles.typeChipText, selected && styles.typeChipTextSelected]}>{type}</Text>
-                    </Pressable>
-                  );
-                })}
-              </View>
-            </View>
           </View>
 
           {error ? <Text style={styles.errorText}>{error}</Text> : null}
@@ -134,19 +118,19 @@ export function VehicleSearchSheet({ bottomSheetRef, onSubmit }: VehicleSearchSh
           <View style={styles.previewCard}>
             <Text style={styles.previewTitle}>Como o MVP calcula?</Text>
             <Text style={styles.previewDescription}>
-              Nesta fase, o Rivalis associa o modelo/tipo a um preset técnico demonstrativo e filtra concorrentes do mesmo segmento para exibir todos os resultados.
+              Nesta fase, o Rivalis usa marca/modelo/ano para selecionar um preset técnico demonstrativo e inferir o segmento mais provável do veículo.
             </Text>
           </View>
 
           <View style={styles.actionsRow}>
             <View style={styles.resetButtonWrapper}>
-              <AnimatedButton label="Reset" onPress={handleReset} pulse={false} />
+              <AnimatedButton label="Reset" onPress={handleReset} />
               <View style={styles.resetIconOverlay} pointerEvents="none">
                 <RotateCcw size={16} color={colors.textPrimary} />
               </View>
             </View>
             <View style={styles.submitButtonWrapper}>
-              <AnimatedButton label="Ver Resultados" onPress={handleSubmit} pulse={false} />
+              <AnimatedButton label="Ver Resultados" onPress={handleSubmit} />
             </View>
           </View>
         </LinearGradient>
@@ -220,52 +204,6 @@ const styles = StyleSheet.create({
   formArea: {
     marginTop: spacing.xl,
     gap: spacing.lg,
-  },
-  typeArea: {
-    gap: spacing.md,
-  },
-  typeLabelRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: spacing.sm,
-  },
-  typeLabel: {
-    fontFamily: fonts.bodyBold,
-    color: colors.textSecondary,
-    fontSize: 12,
-    letterSpacing: 0.7,
-    textTransform: 'uppercase',
-  },
-  typeGrid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: spacing.sm,
-  },
-  typeChip: {
-    paddingHorizontal: spacing.lg,
-    minHeight: 42,
-    borderRadius: radius.pill,
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: colors.glass,
-    borderWidth: 1,
-    borderColor: colors.border,
-  },
-  typeChipSelected: {
-    backgroundColor: colors.accentSoft,
-    borderColor: 'rgba(0,174,239,0.48)',
-  },
-  typeChipText: {
-    fontFamily: fonts.bodySemiBold,
-    color: colors.textSecondary,
-    fontSize: 13,
-  },
-  typeChipTextSelected: {
-    color: colors.accent,
-  },
-  pressed: {
-    opacity: 0.78,
-    transform: [{ scale: 0.98 }],
   },
   errorText: {
     marginTop: spacing.lg,

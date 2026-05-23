@@ -25,7 +25,8 @@ export function ResultsScreen() {
   const [loginVisible, setLoginVisible] = React.useState(false);
 
   const reference = route.params?.reference ?? {
-    name: 'Ford Ranger',
+    brand: 'Ford',
+    name: 'Ranger',
     year: 2025,
     bodyType: 'Picape' as const,
     powerHp: 250,
@@ -90,16 +91,16 @@ export function ResultsScreen() {
                 </View>
                 <View style={styles.heroTitleBlock}>
                   <Text style={styles.kicker}>Resultado da pesquisa</Text>
-                  <Text style={styles.title}>Comparação completa: {reference.name}</Text>
+                  <Text style={styles.title}>Comparação completa: {reference.brand} {reference.name}</Text>
                 </View>
               </View>
 
               <Text style={styles.description}>
-                Esta página exibe todos os concorrentes encontrados para o tipo {reference.bodyType}. Use os cards para apoiar benchmarking, treinamento interno e leitura competitiva no dia a dia.
+                Esta página exibe todos os concorrentes encontrados para o segmento inferido de {reference.brand} {reference.name}. Use os cards para apoiar benchmarking, treinamento interno e leitura competitiva no dia a dia.
               </Text>
 
               <View style={styles.referenceGrid}>
-                <MetricCard icon={Car} label="Modelo Ford" value={reference.name} detail={`${reference.year} • ${reference.bodyType}`} />
+                <MetricCard icon={Car} label="Veículo consultado" value={`${reference.brand} ${reference.name}`} detail={`${reference.year} • Segmento: ${reference.bodyType}`} />
                 <MetricCard icon={Zap} label="Potência estimada" value={`${reference.powerHp} hp`} detail={reference.sourceLabel || 'Preset demonstrativo'} />
                 <MetricCard icon={Gauge} label="Torque estimado" value={`${reference.torqueNm} Nm`} detail="Usado como referência da comparação" />
               </View>

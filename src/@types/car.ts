@@ -16,6 +16,7 @@ export type PremiumCar = {
 };
 
 export type ReferenceVehicle = {
+  brand: string;
   name: string;
   year: number;
   bodyType: VehicleBodyType;
