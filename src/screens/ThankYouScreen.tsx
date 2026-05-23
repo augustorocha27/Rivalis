@@ -8,35 +8,37 @@ import { MotiView } from 'moti';
 
 import type { RootStackParamList } from '../@types/navigation';
 import { colors, fonts, gradients, radius, shadows, spacing } from '../theme';
+import { useResponsive } from '../theme/responsive';
 
 type Navigation = NativeStackNavigationProp<RootStackParamList>;
 
 export function ThankYouScreen() {
   const navigation = useNavigation<Navigation>();
+  const { isPhone, pagePadding } = useResponsive();
 
   return (
     <LinearGradient colors={gradients.appBackground} style={styles.root}>
-      <SafeAreaView style={styles.safeArea}>
+      <SafeAreaView style={[styles.safeArea, { padding: pagePadding }]}>
         <MotiView
           from={{ opacity: 0, translateY: 24, scale: 0.97 }}
           animate={{ opacity: 1, translateY: 0, scale: 1 }}
           transition={{ type: 'timing', duration: 560 }}
           style={styles.cardWrapper}
         >
-          <LinearGradient colors={gradients.premiumPanel} style={styles.card}>
+          <LinearGradient colors={gradients.premiumPanel} style={[styles.card, isPhone && styles.cardPhone]}>
             <View style={styles.iconBadge}>
               <CheckCircle2 size={38} color={colors.accent} strokeWidth={2.6} />
             </View>
             <Text style={styles.kicker}>Piloto interno Rivalis</Text>
-            <Text style={styles.title}>Solicitação de piloto registrada.</Text>
-            <Text style={styles.description}>
+            <Text style={[styles.title, isPhone && styles.titlePhone]}>Solicitação de piloto registrada.</Text>
+            <Text style={[styles.description, isPhone && styles.descriptionPhone]}>
               Obrigado por demonstrar interesse no Rivalis como ferramenta interna de comparação. A próxima etapa é validar o escopo do piloto, a base de dados e o fluxo com as equipes envolvidas.
             </Text>
-            <View style={styles.infoBox}>
+            <View style={[styles.infoBox, isPhone && styles.infoBoxPhone]}>
               <Mail size={20} color={colors.accent} />
               <Text style={styles.infoText}>Para uma apresentação corporativa, valide dados técnicos, fontes oficiais e permissões internas antes de distribuir o MVP.</Text>
             </View>
-            <Pressable onPress={() => navigation.navigate('Home')} style={({ pressed }) => [styles.button, pressed && styles.buttonPressed]}>
+            <Pressable onPress={() => navigation.navigate('Home')} style={({ pressed }) => [styles.button, isPhone && styles.buttonPhone, pressed && styles.buttonPressed]}>
               <ChevronLeft size={18} color={colors.textPrimary} />
               <Text style={styles.buttonText}>Voltar para a página inicial</Text>
             </Pressable>
@@ -68,6 +70,10 @@ const styles = StyleSheet.create({
     borderColor: colors.border,
     alignItems: 'center',
   },
+  cardPhone: {
+    padding: spacing.lg,
+    borderRadius: radius.lg,
+  },
   iconBadge: {
     width: 78,
     height: 78,
@@ -94,6 +100,10 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     letterSpacing: -1.1,
   },
+  titlePhone: {
+    fontSize: 25,
+    lineHeight: 31,
+  },
   description: {
     marginTop: spacing.lg,
     fontFamily: fonts.bodyMedium,
@@ -101,6 +111,10 @@ const styles = StyleSheet.create({
     fontSize: 16,
     lineHeight: 25,
     textAlign: 'center',
+  },
+  descriptionPhone: {
+    fontSize: 14,
+    lineHeight: 22,
   },
   infoBox: {
     marginTop: spacing.xl,
@@ -112,6 +126,9 @@ const styles = StyleSheet.create({
     backgroundColor: colors.glass,
     borderRadius: radius.lg,
     padding: spacing.lg,
+  },
+  infoBoxPhone: {
+    alignItems: 'flex-start',
   },
   infoText: {
     flex: 1,
@@ -133,6 +150,10 @@ const styles = StyleSheet.create({
     ...shadows.primaryGlow,
   },
   buttonPressed: { transform: [{ scale: 0.98 }], opacity: 0.9 },
+  buttonPhone: {
+    width: '100%',
+    paddingHorizontal: spacing.lg,
+  },
   buttonText: {
     fontFamily: fonts.bodyBold,
     color: colors.textPrimary,

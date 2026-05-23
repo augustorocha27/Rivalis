@@ -5,6 +5,7 @@ import { BarChart3, Car, ClipboardList, FileSearch, Gauge, MessagesSquare, Radar
 
 import { BulletRow, InfoCard, PageSection, RivalisPageLayout } from '../components/RivalisPageLayout';
 import { colors, fonts, gradients, radius, shadows, spacing } from '../theme';
+import { useResponsive } from '../theme/responsive';
 
 const steps = [
   {
@@ -48,6 +49,8 @@ const checkpoints = [
 ];
 
 export function WorkflowScreen() {
+  const { isPhone } = useResponsive();
+
   return (
     <RivalisPageLayout
       kicker="Fluxo"
@@ -59,14 +62,14 @@ export function WorkflowScreen() {
           {steps.map((step) => {
             const Icon = step.icon;
             return (
-              <LinearGradient key={step.label} colors={gradients.card} style={styles.stepCard}>
+              <LinearGradient key={step.label} colors={gradients.card} style={[styles.stepCard, isPhone && styles.stepCardPhone]}>
                 <View style={styles.stepNumberBox}>
                   <Text style={styles.stepNumber}>{step.label}</Text>
                 </View>
                 <View style={styles.stepIconBox}>
                   <Icon size={24} color={colors.accent} strokeWidth={2.5} />
                 </View>
-                <View style={styles.stepCopy}>
+                <View style={[styles.stepCopy, isPhone && styles.fullWidth]}>
                   <Text style={styles.stepTitle}>{step.title}</Text>
                   <Text style={styles.stepDescription}>{step.description}</Text>
                 </View>
@@ -81,7 +84,7 @@ export function WorkflowScreen() {
         title="Validação rápida antes de usar uma comparação."
         description="Como a ferramenta é um MVP, a leitura visual precisa ser acompanhada de critérios claros para evitar conclusões fora de contexto."
       >
-        <LinearGradient colors={gradients.premiumPanel} style={styles.checklistCard}>
+        <LinearGradient colors={gradients.premiumPanel} style={[styles.checklistCard, isPhone && styles.checklistCardPhone]}>
           {checkpoints.map((item) => (
             <BulletRow key={item} text={item} />
           ))}
@@ -89,7 +92,7 @@ export function WorkflowScreen() {
       </PageSection>
 
       <PageSection kicker="Saídas esperadas" title="O que o colaborador deve conseguir ao final do fluxo.">
-        <View style={styles.grid}>
+        <View style={[styles.grid, isPhone && styles.gridPhone]}>
           <InfoCard title="Resumo competitivo" description="Saber em poucos segundos quais concorrentes estão próximos e onde há vantagem técnica." icon={FileSearch} />
           <InfoCard title="Narrativa mais clara" description="Transformar indicadores em uma explicação simples para treinamento, atendimento ou reunião interna." icon={ClipboardList} />
           <InfoCard title="Próximo passo definido" description="Identificar se o caso exige material oficial, revisão de dados ou aprofundamento de produto." icon={Route} />
@@ -101,6 +104,7 @@ export function WorkflowScreen() {
 }
 
 const styles = StyleSheet.create({
+  fullWidth: { width: '100%', minWidth: 0, flex: 0 },
   timeline: {
     gap: spacing.lg,
   },
@@ -114,6 +118,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: spacing.lg,
     ...shadows.card,
+  },
+  stepCardPhone: {
+    padding: spacing.lg,
+    alignItems: 'flex-start',
   },
   stepNumberBox: {
     width: 58,
@@ -160,9 +168,16 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: colors.border,
   },
+  checklistCardPhone: {
+    padding: spacing.lg,
+    borderRadius: radius.lg,
+  },
   grid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
     gap: spacing.lg,
+  },
+  gridPhone: {
+    flexDirection: 'column',
   },
 });

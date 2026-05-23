@@ -35,6 +35,7 @@ export function AnimatedButton({ label, onPress, style }: AnimatedButtonProps) {
 const styles = StyleSheet.create({
   wrapper: {
     borderRadius: radius.pill,
+    alignSelf: 'stretch',
     ...shadows.primaryGlow,
   },
   pressable: {
@@ -46,6 +47,7 @@ const styles = StyleSheet.create({
     opacity: 0.9,
   },
   gradient: {
+    width: '100%',
     minHeight: 58,
     paddingHorizontal: spacing.xl,
     borderRadius: radius.pill,
@@ -55,6 +57,8 @@ const styles = StyleSheet.create({
     gap: spacing.md,
   },
   label: {
+    flexShrink: 1,
+    textAlign: 'center',
     fontFamily: fonts.bodyBold,
     color: colors.textPrimary,
     fontSize: 15,

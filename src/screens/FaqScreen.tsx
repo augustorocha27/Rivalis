@@ -5,6 +5,7 @@ import { ChevronDown, ChevronUp, Database, FileCheck2, HelpCircle, LockKeyhole, 
 
 import { InfoCard, PageSection, RivalisPageLayout } from '../components/RivalisPageLayout';
 import { colors, fonts, gradients, radius, shadows, spacing } from '../theme';
+import { useResponsive } from '../theme/responsive';
 
 const faqs = [
   {
@@ -65,6 +66,7 @@ const highlights = [
 ];
 
 export function FaqScreen() {
+  const { isPhone } = useResponsive();
   const [openItems, setOpenItems] = useState<Record<string, boolean>>({});
 
   const toggle = (question: string) => {
@@ -78,7 +80,7 @@ export function FaqScreen() {
       description="Esta página concentra respostas para apresentar o MVP com mais segurança: objetivo, público interno, dados, limitações, evolução e uso responsável."
     >
       <PageSection kicker="Resumo" title="Antes de apresentar o MVP, alinhe estes pontos.">
-        <View style={styles.grid}>
+        <View style={[styles.grid, isPhone && styles.gridPhone]}>
           {highlights.map((item) => (
             <InfoCard key={item.title} title={item.title} description={item.description} icon={item.icon} />
           ))}
@@ -90,15 +92,15 @@ export function FaqScreen() {
           {faqs.map((item) => {
             const isOpen = openItems[item.question];
             return (
-              <LinearGradient key={item.question} colors={gradients.card} style={styles.faqItem}>
-                <Pressable onPress={() => toggle(item.question)} style={({ pressed }) => [styles.faqQuestionRow, pressed && styles.pressed]}>
+              <LinearGradient key={item.question} colors={gradients.card} style={[styles.faqItem, isPhone && styles.faqItemPhone]}>
+                <Pressable onPress={() => toggle(item.question)} style={({ pressed }) => [styles.faqQuestionRow, isPhone && styles.faqQuestionRowPhone, pressed && styles.pressed]}>
                   <View style={styles.questionIcon}>
                     <HelpCircle size={20} color={colors.accent} strokeWidth={2.5} />
                   </View>
-                  <Text style={styles.faqQuestion}>{item.question}</Text>
+                  <Text style={[styles.faqQuestion, isPhone && styles.faqQuestionPhone]}>{item.question}</Text>
                   {isOpen ? <ChevronUp size={20} color={colors.accent} /> : <ChevronDown size={20} color={colors.accent} />}
                 </Pressable>
-                {isOpen ? <Text style={styles.faqAnswer}>{item.answer}</Text> : null}
+                {isOpen ? <Text style={[styles.faqAnswer, isPhone && styles.faqAnswerPhone]}>{item.answer}</Text> : null}
               </LinearGradient>
             );
           })}
@@ -106,9 +108,9 @@ export function FaqScreen() {
       </PageSection>
 
       <PageSection kicker="Segurança de mensagem" title="O que não prometer nesta fase.">
-        <LinearGradient colors={gradients.premiumPanel} style={styles.warningCard}>
+        <LinearGradient colors={gradients.premiumPanel} style={[styles.warningCard, isPhone && styles.warningCardPhone]}>
           <LockKeyhole size={32} color={colors.accent} strokeWidth={2.5} />
-          <Text style={styles.warningTitle}>Evite prometer dados oficiais, recomendação de compra ou implantação corporativa pronta.</Text>
+          <Text style={[styles.warningTitle, isPhone && styles.warningTitlePhone]}>Evite prometer dados oficiais, recomendação de compra ou implantação corporativa pronta.</Text>
           <Text style={styles.warningText}>
             O discurso mais seguro é apresentar o Rivalis como MVP demonstrativo para validar experiência, utilidade, fluxo, visualização e governança de dados antes de qualquer adoção real.
           </Text>
@@ -124,6 +126,9 @@ const styles = StyleSheet.create({
     flexWrap: 'wrap',
     gap: spacing.lg,
   },
+  gridPhone: {
+    flexDirection: 'column',
+  },
   faqList: {
     gap: spacing.md,
   },
@@ -134,12 +139,19 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
     ...shadows.card,
   },
+  faqItemPhone: {
+    borderRadius: radius.md,
+  },
   faqQuestionRow: {
     minHeight: 76,
     padding: spacing.lg,
     flexDirection: 'row',
     alignItems: 'center',
     gap: spacing.md,
+  },
+  faqQuestionRowPhone: {
+    padding: spacing.md,
+    alignItems: 'flex-start',
   },
   questionIcon: {
     width: 42,
@@ -156,6 +168,10 @@ const styles = StyleSheet.create({
     fontSize: 18,
     lineHeight: 24,
   },
+  faqQuestionPhone: {
+    fontSize: 16,
+    lineHeight: 22,
+  },
   faqAnswer: {
     paddingHorizontal: spacing.lg,
     paddingBottom: spacing.lg,
@@ -164,6 +180,10 @@ const styles = StyleSheet.create({
     color: colors.textSecondary,
     fontSize: 14,
     lineHeight: 23,
+  },
+  faqAnswerPhone: {
+    paddingLeft: spacing.md,
+    paddingRight: spacing.md,
   },
   pressed: {
     opacity: 0.8,
@@ -174,12 +194,20 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: colors.border,
   },
+  warningCardPhone: {
+    padding: spacing.lg,
+    borderRadius: radius.lg,
+  },
   warningTitle: {
     marginTop: spacing.lg,
     fontFamily: fonts.headingBold,
     color: colors.textPrimary,
     fontSize: 25,
     lineHeight: 32,
+  },
+  warningTitlePhone: {
+    fontSize: 21,
+    lineHeight: 27,
   },
   warningText: {
     marginTop: spacing.md,

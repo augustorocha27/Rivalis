@@ -28,11 +28,13 @@ import { AnimatedButton } from '../components/AnimatedButton';
 import { LoginModal, type AuthenticatedUser } from '../components/LoginModal';
 import { VehicleSearchSheet } from '../components/VehicleSearchSheet';
 import { colors, fonts, gradients, radius, shadows, spacing } from '../theme';
+import { useResponsive } from '../theme/responsive';
 
 type Navigation = NativeStackNavigationProp<RootStackParamList>;
 
 export function HomeScreen() {
   const navigation = useNavigation<Navigation>();
+  const { isPhone, isMobile, pagePadding, sectionGap } = useResponsive();
   const bottomSheetRef = useRef<BottomSheetModal>(null);
   const scrollRef = useRef<ScrollView>(null);
   const [loginVisible, setLoginVisible] = useState(false);
@@ -130,18 +132,18 @@ export function HomeScreen() {
     <View style={styles.root}>
       <LinearGradient colors={gradients.appBackground} style={styles.background}>
         <SafeAreaView style={styles.safeArea}>
-          <View style={styles.navbar}>
-            <Pressable onPress={() => scrollRef.current?.scrollTo({ y: 0, animated: true })} style={styles.brandArea}>
-              <View style={styles.logoMark}>
-                <Radar size={20} color={colors.accent} strokeWidth={2.7} />
+          <View style={[styles.navbar, isMobile && styles.navbarMobile, { paddingHorizontal: pagePadding }]}>
+            <Pressable onPress={() => scrollRef.current?.scrollTo({ y: 0, animated: true })} style={[styles.brandArea, isMobile && styles.brandAreaMobile]}>
+              <View style={[styles.logoMark, isPhone && styles.logoMarkPhone]}>
+                <Radar size={isPhone ? 18 : 20} color={colors.accent} strokeWidth={2.7} />
               </View>
-              <View>
-                <Text style={styles.brandName}>RIVALIS</Text>
-                <Text style={styles.brandCaption}>Internal Vehicle Intelligence</Text>
+              <View style={styles.brandCopy}>
+                <Text style={[styles.brandName, isPhone && styles.brandNamePhone]}>RIVALIS</Text>
+                <Text style={[styles.brandCaption, isPhone && styles.brandCaptionPhone]}>Internal Vehicle Intelligence</Text>
               </View>
             </Pressable>
 
-            <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.navLinks}>
+            <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={[styles.navLinks, isMobile && styles.navLinksMobile]}>
               {navLinks.map((item) => (
                 <Pressable key={item.route} onPress={() => navigation.navigate(item.route)} style={({ pressed }) => [styles.navLink, pressed && styles.pressed]}>
                   <Text style={styles.navLinkText}>{item.label}</Text>
@@ -154,7 +156,7 @@ export function HomeScreen() {
                 <View style={styles.userBadge}>
                   <ShieldCheck size={15} color={colors.accent} strokeWidth={2.5} />
                   <View>
-                    <Text style={styles.userBadgeName}>{authenticatedUser.name}</Text>
+                    <Text numberOfLines={1} style={[styles.userBadgeName, isPhone && styles.userBadgeNamePhone]}>{authenticatedUser.name}</Text>
                     <Text style={styles.userBadgeStatus}>Autenticado</Text>
                   </View>
                 </View>
@@ -167,27 +169,27 @@ export function HomeScreen() {
             </ScrollView>
           </View>
 
-          <ScrollView ref={scrollRef} showsVerticalScrollIndicator={false} contentContainerStyle={styles.content}>
-            <View style={styles.heroSection}>
+          <ScrollView ref={scrollRef} showsVerticalScrollIndicator={false} contentContainerStyle={[styles.content, { paddingHorizontal: pagePadding, paddingBottom: sectionGap }]}>
+            <View style={[styles.heroSection, isMobile && styles.heroSectionMobile, { paddingTop: sectionGap, paddingBottom: sectionGap }]}>
               <MotiView
                 from={{ opacity: 0, translateY: 26 }}
                 animate={{ opacity: 1, translateY: 0 }}
                 transition={{ type: 'timing', duration: 620 }}
-                style={styles.heroCopy}
+                style={[styles.heroCopy, isMobile && styles.fullWidth]}
               >
-                <View style={styles.heroBadge}>
+                <View style={[styles.heroBadge, isPhone && styles.heroBadgePhone]}>
                   <ShieldCheck size={16} color={colors.accent} strokeWidth={2.5} />
                   <Text style={styles.heroBadgeText}>Ferramenta interna para inteligência competitiva automotiva</Text>
                 </View>
 
-                <Text style={styles.heroTitle}>Compare modelos Ford contra concorrentes em uma tela de trabalho.</Text>
-                <Text style={styles.heroSubtitle}>
+                <Text style={[styles.heroTitle, isMobile && styles.heroTitleMobile, isPhone && styles.heroTitlePhone]}>Compare modelos Ford contra concorrentes em uma tela de trabalho.</Text>
+                <Text style={[styles.heroSubtitle, isPhone && styles.heroSubtitlePhone]}>
                   O Rivalis ajuda colaboradores a pesquisarem veículos por marca, modelo e ano para visualizar resultados comparativos contra concorrentes do mesmo segmento.
                 </Text>
 
-                <View style={styles.heroActions}>
-                  <AnimatedButton label="Comparar Concorrentes" onPress={openSearch} />
-                  <Pressable onPress={() => navigation.navigate('Fluxo')} style={({ pressed }) => [styles.secondaryCta, pressed && styles.pressed]}>
+                <View style={[styles.heroActions, isPhone && styles.actionsMobile]}>
+                  <AnimatedButton label="Comparar Concorrentes" onPress={openSearch} style={isPhone ? styles.fullButton : undefined} />
+                  <Pressable onPress={() => navigation.navigate('Fluxo')} style={({ pressed }) => [styles.secondaryCta, isPhone && styles.fullButton, pressed && styles.pressed]}>
                     <Text style={styles.secondaryCtaText}>Ver fluxo de uso</Text>
                     <ChevronRight size={17} color={colors.accent} />
                   </Pressable>
@@ -202,11 +204,11 @@ export function HomeScreen() {
                   </View>
                 ) : null}
 
-                <View style={styles.statsGrid}>
+                <View style={[styles.statsGrid, isPhone && styles.singleColumnGrid]}>
                   {stats.map((stat) => {
                     const Icon = stat.icon;
                     return (
-                      <LinearGradient key={stat.label} colors={gradients.card} style={styles.statCard}>
+                      <LinearGradient key={stat.label} colors={gradients.card} style={[styles.statCard, isPhone && styles.fullWidth]}>
                         <Icon size={20} color={colors.accent} strokeWidth={2.5} />
                         <Text style={styles.statValue}>{stat.value}</Text>
                         <Text style={styles.statLabel}>{stat.label}</Text>
@@ -220,13 +222,13 @@ export function HomeScreen() {
                 from={{ opacity: 0, scale: 0.94, translateY: 20 }}
                 animate={{ opacity: 1, scale: 1, translateY: 0 }}
                 transition={{ type: 'timing', duration: 720, delay: 180 }}
-                style={styles.heroVisualWrapper}
+                style={[styles.heroVisualWrapper, isMobile && styles.fullWidth]}
               >
-                <LinearGradient colors={gradients.premiumPanel} style={styles.heroVisual}>
-                  <View style={styles.visualHeader}>
-                    <View>
+                <LinearGradient colors={gradients.premiumPanel} style={[styles.heroVisual, isPhone && styles.heroVisualPhone]}>
+                  <View style={[styles.visualHeader, isPhone && styles.visualHeaderPhone]}>
+                    <View style={styles.visualTitleBlock}>
                       <Text style={styles.visualKicker}>Painel de comparação</Text>
-                      <Text style={styles.visualTitle}>Pesquisa por segmento</Text>
+                      <Text style={[styles.visualTitle, isPhone && styles.visualTitlePhone]}>Pesquisa por segmento</Text>
                     </View>
                     <View style={styles.livePill}>
                       <View style={styles.liveDot} />
@@ -259,19 +261,19 @@ export function HomeScreen() {
               </MotiView>
             </View>
 
-            <View style={styles.quickAccessSection}>
+            <View style={[styles.quickAccessSection, { marginBottom: sectionGap }]}>
               <Text style={styles.sectionKicker}>Acesso rápido</Text>
-              <Text style={styles.sectionTitle}>A Home agora é uma porta de entrada. O conteúdo detalhado fica em páginas próprias.</Text>
+              <Text style={[styles.sectionTitle, isPhone && styles.sectionTitlePhone]}>A Home agora é uma porta de entrada. O conteúdo detalhado fica em páginas próprias.</Text>
               <Text style={styles.sectionDescription}>
                 Use os atalhos abaixo para navegar pelo material explicativo ou abra o comparador para gerar a tela completa de resultados.
               </Text>
 
-              <View style={styles.quickAccessGrid}>
+              <View style={[styles.quickAccessGrid, isPhone && styles.singleColumnGrid]}>
                 {quickAccess.map((item) => {
                   const Icon = item.icon;
                   return (
-                    <Pressable key={item.title} onPress={() => navigation.navigate(item.route)} style={({ pressed }) => [styles.quickAccessPressable, pressed && styles.pressed]}>
-                      <LinearGradient colors={gradients.card} style={styles.quickAccessCard}>
+                    <Pressable key={item.title} onPress={() => navigation.navigate(item.route)} style={({ pressed }) => [styles.quickAccessPressable, isPhone && styles.fullWidth, pressed && styles.pressed]}>
+                      <LinearGradient colors={gradients.card} style={[styles.quickAccessCard, isPhone && styles.quickAccessCardPhone]}>
                         <View style={styles.quickAccessIcon}>
                           <Icon size={24} color={colors.accent} strokeWidth={2.5} />
                         </View>
@@ -288,29 +290,29 @@ export function HomeScreen() {
               </View>
             </View>
 
-            <LinearGradient colors={gradients.premiumPanel} style={styles.comparePanel}>
+            <LinearGradient colors={gradients.premiumPanel} style={[styles.comparePanel, isPhone && styles.comparePanelPhone, { marginBottom: sectionGap }]}>
               <Text style={styles.compareKicker}>Resultados em página dedicada</Text>
-              <Text style={styles.compareTitle}>Pesquise um modelo Ford e abra uma tela completa com todos os concorrentes.</Text>
+              <Text style={[styles.compareTitle, isPhone && styles.compareTitlePhone]}>Pesquise um modelo Ford e abra uma tela completa com todos os concorrentes.</Text>
               <Text style={styles.compareDescription}>
                 O formulário foi simplificado para Marca, Modelo e Ano. A partir disso, o Rivalis filtra concorrentes e apresenta cards comparativos com ranking, potência, torque e leitura de vantagem competitiva. A pesquisa só é liberada após login demonstrativo.
               </Text>
-              <View style={styles.compareActions}>
-                <AnimatedButton label="Comparar Concorrentes" onPress={openSearch} />
-                <Pressable onPress={() => navigation.navigate('FAQ')} style={({ pressed }) => [styles.faqShortcut, pressed && styles.pressed]}>
+              <View style={[styles.compareActions, isPhone && styles.actionsMobile]}>
+                <AnimatedButton label="Comparar Concorrentes" onPress={openSearch} style={isPhone ? styles.fullButton : undefined} />
+                <Pressable onPress={() => navigation.navigate('FAQ')} style={({ pressed }) => [styles.faqShortcut, isPhone && styles.fullButton, pressed && styles.pressed]}>
                   <FileQuestion size={17} color={colors.accent} strokeWidth={2.4} />
                   <Text style={styles.faqShortcutText}>Abrir FAQ</Text>
                 </Pressable>
               </View>
             </LinearGradient>
 
-            <LinearGradient colors={gradients.premiumPanel} style={styles.footerShell}>
-              <View style={styles.footerTop}>
-                <View style={styles.footerBrandBlock}>
+            <LinearGradient colors={gradients.premiumPanel} style={[styles.footerShell, isPhone && styles.footerShellPhone]}>
+              <View style={[styles.footerTop, isMobile && styles.footerTopMobile]}>
+                <View style={[styles.footerBrandBlock, isMobile && styles.fullWidth]}>
                   <View style={styles.footerLogoRow}>
                     <View style={styles.footerLogoMark}>
                       <Radar size={22} color={colors.accent} strokeWidth={2.7} />
                     </View>
-                    <View>
+                    <View style={styles.brandCopy}>
                       <Text style={styles.footerBrand}>RIVALIS</Text>
                       <Text style={styles.footerSubBrand}>Internal Vehicle Intelligence</Text>
                     </View>
@@ -327,8 +329,8 @@ export function HomeScreen() {
                   </View>
                 </View>
 
-                <View style={styles.footerGrid}>
-                  <View style={styles.footerColumn}>
+                <View style={[styles.footerGrid, isMobile && styles.footerGridMobile]}>
+                  <View style={[styles.footerColumn, isPhone && styles.fullWidth]}>
                     <Text style={styles.footerColumnTitle}>Navegação</Text>
                     <Pressable onPress={() => navigation.navigate('UsoInterno')}><Text style={styles.footerLink}>Uso interno</Text></Pressable>
                     <Pressable onPress={() => navigation.navigate('Fluxo')}><Text style={styles.footerLink}>Fluxo</Text></Pressable>
@@ -337,7 +339,7 @@ export function HomeScreen() {
                     <Pressable onPress={openSearch}><Text style={styles.footerLink}>Abrir comparador</Text></Pressable>
                   </View>
 
-                  <View style={styles.footerColumn}>
+                  <View style={[styles.footerColumn, isPhone && styles.fullWidth]}>
                     <Text style={styles.footerColumnTitle}>Aplicações</Text>
                     <Text style={styles.footerMutedLink}>Treinamento de produto</Text>
                     <Text style={styles.footerMutedLink}>Benchmarking competitivo</Text>
@@ -345,7 +347,7 @@ export function HomeScreen() {
                     <Text style={styles.footerMutedLink}>Consulta técnica rápida</Text>
                   </View>
 
-                  <View style={styles.footerColumn}>
+                  <View style={[styles.footerColumn, isPhone && styles.fullWidth]}>
                     <Text style={styles.footerColumnTitle}>Links</Text>
                     <Pressable onPress={() => openExternal('https://instagram.com/rivalis.app')} style={styles.externalLinkRow}>
                       <Text style={styles.footerLink}>Instagram</Text>
@@ -407,87 +409,113 @@ const styles = StyleSheet.create({
   safeArea: { flex: 1 },
   navbar: {
     minHeight: 74,
-    paddingHorizontal: spacing.lg,
     paddingVertical: spacing.md,
-    backgroundColor: 'rgba(7,17,31,0.92)',
+    backgroundColor: 'rgba(7,17,31,0.94)',
     borderBottomWidth: 1,
     borderBottomColor: colors.border,
     flexDirection: 'row',
     alignItems: 'center',
     gap: spacing.md,
   },
+  navbarMobile: { flexDirection: 'column', alignItems: 'stretch', gap: spacing.sm },
   brandArea: { flexDirection: 'row', alignItems: 'center', gap: spacing.md, minWidth: 194 },
+  brandAreaMobile: { minWidth: 0, width: '100%', justifyContent: 'flex-start' },
+  brandCopy: { flexShrink: 1 },
   logoMark: { width: 42, height: 42, borderRadius: 15, alignItems: 'center', justifyContent: 'center', backgroundColor: colors.accentSoft, borderWidth: 1, borderColor: 'rgba(0,174,239,0.36)' },
+  logoMarkPhone: { width: 38, height: 38, borderRadius: 14 },
   brandName: { fontFamily: fonts.headingBold, color: colors.textPrimary, fontSize: 16, letterSpacing: 2.8 },
+  brandNamePhone: { fontSize: 15, letterSpacing: 2.2 },
   brandCaption: { marginTop: 2, fontFamily: fonts.bodyMedium, color: colors.textMuted, fontSize: 10, letterSpacing: 0.4 },
-  navLinks: { flexGrow: 1, alignItems: 'center', justifyContent: 'flex-end', gap: spacing.sm, paddingLeft: spacing.md },
+  brandCaptionPhone: { fontSize: 9 },
+  navLinks: { flexGrow: 1, alignItems: 'center', justifyContent: 'flex-end', gap: spacing.sm, paddingLeft: spacing.md, paddingRight: spacing.md },
+  navLinksMobile: { justifyContent: 'flex-start', paddingLeft: 0, paddingRight: spacing.lg, paddingVertical: spacing.xs },
   navLink: { minHeight: 38, paddingHorizontal: spacing.md, borderRadius: radius.pill, alignItems: 'center', justifyContent: 'center' },
   navLinkText: { fontFamily: fonts.bodySemiBold, color: colors.textSecondary, fontSize: 12 },
   navCta: { minHeight: 38, paddingHorizontal: spacing.lg, borderRadius: radius.pill, alignItems: 'center', justifyContent: 'center', backgroundColor: colors.accent, ...shadows.cyanGlow },
   navCtaText: { fontFamily: fonts.bodyBold, color: colors.textPrimary, fontSize: 12, textTransform: 'uppercase', letterSpacing: 0.4 },
   loginButton: { minHeight: 38, paddingHorizontal: spacing.lg, borderRadius: radius.pill, alignItems: 'center', justifyContent: 'center', flexDirection: 'row', gap: spacing.sm, backgroundColor: colors.glass, borderWidth: 1, borderColor: colors.border },
   loginButtonText: { fontFamily: fonts.bodyBold, color: colors.silver, fontSize: 12, textTransform: 'uppercase', letterSpacing: 0.4 },
-  userBadge: { minHeight: 42, paddingHorizontal: spacing.lg, borderRadius: radius.pill, alignItems: 'center', justifyContent: 'center', flexDirection: 'row', gap: spacing.sm, backgroundColor: colors.surfaceElevated, borderWidth: 1, borderColor: 'rgba(0,174,239,0.34)' },
+  userBadge: { minHeight: 42, paddingHorizontal: spacing.md, borderRadius: radius.pill, alignItems: 'center', justifyContent: 'center', flexDirection: 'row', gap: spacing.sm, backgroundColor: colors.surfaceElevated, borderWidth: 1, borderColor: 'rgba(0,174,239,0.34)' },
   userBadgeName: { fontFamily: fonts.bodyBold, color: colors.textPrimary, fontSize: 12, maxWidth: 150 },
+  userBadgeNamePhone: { maxWidth: 110 },
   userBadgeStatus: { fontFamily: fonts.bodyMedium, color: colors.accent, fontSize: 10, marginTop: 1, textTransform: 'uppercase', letterSpacing: 0.5 },
   pressed: { opacity: 0.78, transform: [{ scale: 0.98 }] },
-  content: { paddingHorizontal: spacing.lg, paddingBottom: spacing.huge },
-  heroSection: { width: '100%', maxWidth: 1180, alignSelf: 'center', flexDirection: 'row', gap: spacing.xxl, alignItems: 'center', paddingTop: spacing.huge, paddingBottom: spacing.huge, flexWrap: 'wrap' },
+  content: { paddingBottom: spacing.huge },
+  heroSection: { width: '100%', maxWidth: 1180, alignSelf: 'center', flexDirection: 'row', gap: spacing.xxl, alignItems: 'center', flexWrap: 'wrap' },
+  heroSectionMobile: { flexDirection: 'column', alignItems: 'stretch', gap: spacing.xl },
   heroCopy: { flex: 1, minWidth: 310 },
+  fullWidth: { width: '100%', minWidth: 0, flex: 0 },
+  fullButton: { width: '100%' },
   heroBadge: { alignSelf: 'flex-start', flexDirection: 'row', alignItems: 'center', gap: spacing.sm, paddingHorizontal: spacing.md, paddingVertical: spacing.sm, borderRadius: radius.pill, backgroundColor: colors.accentSoft, borderWidth: 1, borderColor: 'rgba(0,174,239,0.32)', marginBottom: spacing.xl },
-  heroBadgeText: { fontFamily: fonts.bodyBold, color: colors.silver, fontSize: 12, letterSpacing: 0.3 },
+  heroBadgePhone: { borderRadius: radius.lg, alignItems: 'flex-start' },
+  heroBadgeText: { flexShrink: 1, fontFamily: fonts.bodyBold, color: colors.silver, fontSize: 12, lineHeight: 18, letterSpacing: 0.3 },
   heroTitle: { fontFamily: fonts.headingBold, color: colors.textPrimary, fontSize: 48, lineHeight: 54, letterSpacing: -1.8 },
+  heroTitleMobile: { fontSize: 38, lineHeight: 44, letterSpacing: -1.1 },
+  heroTitlePhone: { fontSize: 30, lineHeight: 36, letterSpacing: -0.8 },
   heroSubtitle: { marginTop: spacing.lg, fontFamily: fonts.bodyMedium, color: colors.textSecondary, fontSize: 16, lineHeight: 26, maxWidth: 680 },
+  heroSubtitlePhone: { fontSize: 14, lineHeight: 22 },
   heroActions: { marginTop: spacing.xxl, flexDirection: 'row', alignItems: 'center', flexWrap: 'wrap', gap: spacing.lg },
+  actionsMobile: { flexDirection: 'column', alignItems: 'stretch', gap: spacing.md },
   secondaryCta: { minHeight: 56, paddingHorizontal: spacing.xl, borderRadius: radius.pill, borderWidth: 1, borderColor: colors.border, backgroundColor: colors.glass, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: spacing.sm },
   secondaryCtaText: { fontFamily: fonts.bodyBold, color: colors.silver, fontSize: 14 },
   microcopy: { marginTop: spacing.lg, fontFamily: fonts.bodyMedium, color: colors.textMuted, fontSize: 13, lineHeight: 20, maxWidth: 680 },
   authNotice: { marginTop: spacing.lg, paddingHorizontal: spacing.md, paddingVertical: spacing.md, borderRadius: radius.md, backgroundColor: colors.backgroundSoft, borderWidth: 1, borderColor: 'rgba(0,174,239,0.34)', flexDirection: 'row', alignItems: 'center', gap: spacing.sm, maxWidth: 680 },
   authNoticeText: { flex: 1, fontFamily: fonts.bodySemiBold, color: colors.silver, fontSize: 13, lineHeight: 20 },
   statsGrid: { marginTop: spacing.xxl, flexDirection: 'row', flexWrap: 'wrap', gap: spacing.md },
+  singleColumnGrid: { flexDirection: 'column', alignItems: 'stretch' },
   statCard: { flexGrow: 1, minWidth: 150, borderRadius: radius.lg, padding: spacing.lg, borderWidth: 1, borderColor: colors.border },
   statValue: { marginTop: spacing.md, fontFamily: fonts.headingBold, color: colors.textPrimary, fontSize: 22 },
   statLabel: { marginTop: 2, fontFamily: fonts.bodyMedium, color: colors.textSecondary, fontSize: 12 },
   heroVisualWrapper: { flex: 0.92, minWidth: 310, borderRadius: radius.xl, ...shadows.card },
   heroVisual: { borderRadius: radius.xl, padding: spacing.xl, borderWidth: 1, borderColor: colors.border, overflow: 'hidden' },
+  heroVisualPhone: { padding: spacing.lg, borderRadius: radius.lg },
   visualHeader: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: spacing.md },
+  visualHeaderPhone: { alignItems: 'flex-start' },
+  visualTitleBlock: { flex: 1 },
   visualKicker: { fontFamily: fonts.bodyBold, color: colors.accent, fontSize: 11, letterSpacing: 1.6, textTransform: 'uppercase' },
   visualTitle: { marginTop: 4, fontFamily: fonts.heading, color: colors.textPrimary, fontSize: 24 },
+  visualTitlePhone: { fontSize: 20, lineHeight: 26 },
   livePill: { flexDirection: 'row', alignItems: 'center', gap: 7, borderRadius: radius.pill, paddingHorizontal: spacing.md, paddingVertical: spacing.sm, backgroundColor: colors.accentSoft },
   liveDot: { width: 8, height: 8, borderRadius: 4, backgroundColor: colors.accent },
   liveText: { fontFamily: fonts.bodyBold, color: colors.accent, fontSize: 11, letterSpacing: 1 },
   searchPreviewCard: { marginTop: spacing.xl, borderRadius: radius.lg, padding: spacing.lg, backgroundColor: colors.glass, borderWidth: 1, borderColor: colors.border, gap: spacing.md },
   searchPreviewLabel: { fontFamily: fonts.bodyBold, color: colors.textSecondary, fontSize: 11, textTransform: 'uppercase', letterSpacing: 1 },
   searchPreviewRow: { flexDirection: 'row', alignItems: 'center', gap: spacing.md },
-  searchPreviewText: { fontFamily: fonts.bodySemiBold, color: colors.textPrimary, fontSize: 15 },
+  searchPreviewText: { flexShrink: 1, fontFamily: fonts.bodySemiBold, color: colors.textPrimary, fontSize: 15 },
   visualBars: { marginTop: spacing.xl, gap: spacing.lg },
   metricPreview: { gap: spacing.sm },
   metricHeader: { flexDirection: 'row', justifyContent: 'space-between', gap: spacing.md },
-  metricLabel: { fontFamily: fonts.bodySemiBold, color: colors.textSecondary, fontSize: 12, textTransform: 'uppercase', letterSpacing: 0.5 },
+  metricLabel: { flexShrink: 1, fontFamily: fonts.bodySemiBold, color: colors.textSecondary, fontSize: 12, textTransform: 'uppercase', letterSpacing: 0.5 },
   metricValue: { fontFamily: fonts.bodyBold, color: colors.silver, fontSize: 12 },
   metricTrack: { height: 10, borderRadius: radius.pill, overflow: 'hidden', backgroundColor: 'rgba(255,255,255,0.08)' },
   metricFill: { height: '100%', borderRadius: radius.pill, backgroundColor: colors.accent },
-  quickAccessSection: { width: '100%', maxWidth: 1180, alignSelf: 'center', marginBottom: spacing.huge },
+  quickAccessSection: { width: '100%', maxWidth: 1180, alignSelf: 'center' },
   sectionKicker: { fontFamily: fonts.bodyBold, color: colors.accent, fontSize: 12, textTransform: 'uppercase', letterSpacing: 1.5, marginBottom: spacing.sm },
   sectionTitle: { fontFamily: fonts.headingBold, color: colors.textPrimary, fontSize: 32, lineHeight: 40, letterSpacing: -0.9, maxWidth: 900 },
+  sectionTitlePhone: { fontSize: 25, lineHeight: 31 },
   sectionDescription: { marginTop: spacing.md, fontFamily: fonts.bodyMedium, color: colors.textSecondary, fontSize: 15, lineHeight: 24, maxWidth: 860 },
   quickAccessGrid: { marginTop: spacing.xl, flexDirection: 'row', flexWrap: 'wrap', gap: spacing.lg },
   quickAccessPressable: { flex: 1, minWidth: 250 },
   quickAccessCard: { minHeight: 230, borderRadius: radius.lg, padding: spacing.xl, borderWidth: 1, borderColor: colors.border },
+  quickAccessCardPhone: { minHeight: 0, padding: spacing.lg },
   quickAccessIcon: { width: 54, height: 54, borderRadius: 18, alignItems: 'center', justifyContent: 'center', backgroundColor: colors.accentSoft, marginBottom: spacing.lg },
   quickAccessTitle: { fontFamily: fonts.heading, color: colors.textPrimary, fontSize: 22 },
   quickAccessDescription: { marginTop: spacing.sm, fontFamily: fonts.bodyMedium, color: colors.textSecondary, fontSize: 14, lineHeight: 22 },
-  quickAccessFooter: { marginTop: 'auto', flexDirection: 'row', alignItems: 'center', gap: spacing.xs },
+  quickAccessFooter: { marginTop: spacing.lg, flexDirection: 'row', alignItems: 'center', gap: spacing.xs },
   quickAccessLink: { fontFamily: fonts.bodyBold, color: colors.accent, fontSize: 13 },
-  comparePanel: { width: '100%', maxWidth: 1180, alignSelf: 'center', borderRadius: radius.xl, padding: spacing.xxl, borderWidth: 1, borderColor: colors.border, marginBottom: spacing.huge, ...shadows.card },
+  comparePanel: { width: '100%', maxWidth: 1180, alignSelf: 'center', borderRadius: radius.xl, padding: spacing.xxl, borderWidth: 1, borderColor: colors.border, ...shadows.card },
+  comparePanelPhone: { padding: spacing.lg, borderRadius: radius.lg },
   compareKicker: { fontFamily: fonts.bodyBold, color: colors.accent, fontSize: 12, textTransform: 'uppercase', letterSpacing: 1.5 },
   compareTitle: { marginTop: spacing.sm, fontFamily: fonts.headingBold, color: colors.textPrimary, fontSize: 32, lineHeight: 40 },
+  compareTitlePhone: { fontSize: 24, lineHeight: 31 },
   compareDescription: { marginTop: spacing.md, fontFamily: fonts.bodyMedium, color: colors.textSecondary, fontSize: 15, lineHeight: 24, maxWidth: 820 },
   compareActions: { marginTop: spacing.xl, flexDirection: 'row', alignItems: 'center', flexWrap: 'wrap', gap: spacing.lg },
-  faqShortcut: { minHeight: 52, flexDirection: 'row', alignItems: 'center', gap: spacing.sm, paddingHorizontal: spacing.lg, borderRadius: radius.pill, backgroundColor: colors.glass, borderWidth: 1, borderColor: colors.border },
+  faqShortcut: { minHeight: 52, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: spacing.sm, paddingHorizontal: spacing.lg, borderRadius: radius.pill, backgroundColor: colors.glass, borderWidth: 1, borderColor: colors.border },
   faqShortcutText: { fontFamily: fonts.bodyBold, color: colors.silver, fontSize: 14 },
   footerShell: { width: '100%', maxWidth: 1180, alignSelf: 'center', borderRadius: radius.xl, borderWidth: 1, borderColor: colors.border, padding: spacing.xl, marginTop: spacing.lg, ...shadows.card },
+  footerShellPhone: { padding: spacing.lg, borderRadius: radius.lg },
   footerTop: { flexDirection: 'row', flexWrap: 'wrap', gap: spacing.xxl },
+  footerTopMobile: { flexDirection: 'column', gap: spacing.xl },
   footerBrandBlock: { flex: 1, minWidth: 280 },
   footerLogoRow: { flexDirection: 'row', alignItems: 'center', gap: spacing.md },
   footerLogoMark: { width: 48, height: 48, borderRadius: 16, alignItems: 'center', justifyContent: 'center', backgroundColor: colors.accentSoft, borderWidth: 1, borderColor: 'rgba(0,174,239,0.36)' },
@@ -498,6 +526,7 @@ const styles = StyleSheet.create({
   footerBadge: { paddingVertical: spacing.sm, paddingHorizontal: spacing.md, borderRadius: radius.pill, backgroundColor: colors.accentSoft, borderWidth: 1, borderColor: 'rgba(0,174,239,0.28)' },
   footerBadgeText: { fontFamily: fonts.bodyBold, color: colors.accent, fontSize: 11 },
   footerGrid: { flex: 1.2, minWidth: 320, flexDirection: 'row', flexWrap: 'wrap', gap: spacing.xl },
+  footerGridMobile: { width: '100%', minWidth: 0, flex: 0, gap: spacing.lg },
   footerColumn: { minWidth: 150, gap: spacing.sm },
   footerColumnTitle: { fontFamily: fonts.bodyBold, color: colors.textPrimary, fontSize: 13, textTransform: 'uppercase', letterSpacing: 1, marginBottom: spacing.sm },
   footerLink: { fontFamily: fonts.bodySemiBold, color: colors.accent, fontSize: 13, lineHeight: 22 },
@@ -505,6 +534,6 @@ const styles = StyleSheet.create({
   externalLinkRow: { flexDirection: 'row', alignItems: 'center', gap: spacing.xs },
   footerDivider: { height: 1, backgroundColor: colors.border, marginVertical: spacing.xl },
   footerBottom: { gap: spacing.sm },
-  footerLegal: { fontFamily: fonts.bodyBold, color: colors.silver, fontSize: 13 },
+  footerLegal: { fontFamily: fonts.bodyBold, color: colors.silver, fontSize: 13, lineHeight: 20 },
   footerDisclaimer: { fontFamily: fonts.bodyMedium, color: colors.textMuted, fontSize: 12, lineHeight: 19 },
 });

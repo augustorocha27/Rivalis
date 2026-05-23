@@ -12,6 +12,7 @@ import { Building2, CalendarDays, Car, RotateCcw, Search } from 'lucide-react-na
 import type { ReferenceVehicle } from '../@types/car';
 import { buildVehicleReference } from '../data/fordReferences';
 import { colors, fonts, gradients, radius, shadows, spacing } from '../theme';
+import { useResponsive } from '../theme/responsive';
 import { AnimatedButton } from './AnimatedButton';
 import { RivalisInput } from './RivalisInput';
 
@@ -21,7 +22,8 @@ type VehicleSearchSheetProps = {
 };
 
 export function VehicleSearchSheet({ bottomSheetRef, onSubmit }: VehicleSearchSheetProps) {
-  const snapPoints = useMemo(() => ['58%', '82%'], []);
+  const { isPhone, pagePadding } = useResponsive();
+  const snapPoints = useMemo(() => (isPhone ? ['90%', '96%'] : ['58%', '82%']), [isPhone]);
   const [brand, setBrand] = useState('Ford');
   const [model, setModel] = useState('Ranger');
   const [year, setYear] = useState('2025');
@@ -65,9 +67,9 @@ export function VehicleSearchSheet({ bottomSheetRef, onSubmit }: VehicleSearchSh
         <BottomSheetBackdrop {...props} appearsOnIndex={0} disappearsOnIndex={-1} opacity={0.72} />
       )}
     >
-      <BottomSheetScrollView contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled">
-        <LinearGradient colors={gradients.sheet} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={styles.innerPanel}>
-          <View style={styles.titleRow}>
+      <BottomSheetScrollView contentContainerStyle={[styles.content, { paddingHorizontal: pagePadding }, isPhone && styles.contentPhone]} keyboardShouldPersistTaps="handled">
+        <LinearGradient colors={gradients.sheet} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={[styles.innerPanel, isPhone && styles.innerPanelPhone]}>
+          <View style={[styles.titleRow, isPhone && styles.titleRowPhone]}>
             <View style={styles.iconBadge}>
               <Search size={24} color={colors.accent} strokeWidth={2.6} />
             </View>
@@ -122,14 +124,14 @@ export function VehicleSearchSheet({ bottomSheetRef, onSubmit }: VehicleSearchSh
             </Text>
           </View>
 
-          <View style={styles.actionsRow}>
-            <View style={styles.resetButtonWrapper}>
+          <View style={[styles.actionsRow, isPhone && styles.actionsRowPhone]}>
+            <View style={[styles.resetButtonWrapper, isPhone && styles.actionButtonPhone]}>
               <AnimatedButton label="Reset" onPress={handleReset} />
               <View style={styles.resetIconOverlay} pointerEvents="none">
                 <RotateCcw size={16} color={colors.textPrimary} />
               </View>
             </View>
-            <View style={styles.submitButtonWrapper}>
+            <View style={[styles.submitButtonWrapper, isPhone && styles.actionButtonPhone]}>
               <AnimatedButton label="Ver Resultados" onPress={handleSubmit} />
             </View>
           </View>
@@ -155,6 +157,9 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.lg,
     paddingBottom: spacing.xxl,
   },
+  contentPhone: {
+    paddingBottom: spacing.huge,
+  },
   innerPanel: {
     borderRadius: radius.lg,
     padding: spacing.lg,
@@ -162,10 +167,17 @@ const styles = StyleSheet.create({
     borderColor: colors.border,
     ...shadows.card,
   },
+  innerPanelPhone: {
+    padding: spacing.lg,
+    borderRadius: radius.lg,
+  },
   titleRow: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: spacing.md,
+  },
+  titleRowPhone: {
+    alignItems: 'flex-start',
   },
   iconBadge: {
     width: 52,
@@ -236,9 +248,15 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     gap: spacing.md,
   },
+  actionsRowPhone: {
+    flexDirection: 'column',
+  },
   resetButtonWrapper: {
     width: 118,
     position: 'relative',
+  },
+  actionButtonPhone: {
+    width: '100%',
   },
   resetIconOverlay: {
     position: 'absolute',

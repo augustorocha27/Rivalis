@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
-import { Modal, Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
+import { KeyboardAvoidingView, Modal, Platform, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
 import { LockKeyhole, Mail, ShieldCheck, User, X } from 'lucide-react-native';
 
 import { colors, fonts, radius, shadows, spacing } from '../theme';
+import { useResponsive } from '../theme/responsive';
 import { AnimatedButton } from './AnimatedButton';
 
 export type AuthenticatedUser = {
@@ -13,7 +14,7 @@ export type AuthenticatedUser = {
 type LoginModalProps = {
   visible: boolean;
   onClose: () => void;
-  onAuthenticated: (user: AuthenticatedUser) => void;
+  onAuthenticated?: (user: AuthenticatedUser) => void;
 };
 
 type AuthStatus = 'idle' | 'loading' | 'success';
@@ -29,6 +30,7 @@ function getNameFromEmail(email: string) {
 }
 
 export function LoginModal({ visible, onClose, onAuthenticated }: LoginModalProps) {
+  const { isPhone, pagePadding, height } = useResponsive();
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -65,7 +67,7 @@ export function LoginModal({ visible, onClose, onAuthenticated }: LoginModalProp
         email: cleanEmail,
       };
 
-      onAuthenticated(authenticatedUser);
+      onAuthenticated?.(authenticatedUser);
       setStatus('success');
       setPassword('');
       setMessage('Acesso autorizado. Redirecionando para o painel Rivalis...');
@@ -87,96 +89,102 @@ export function LoginModal({ visible, onClose, onAuthenticated }: LoginModalProp
 
   return (
     <Modal visible={visible} transparent={false} animationType="fade" onRequestClose={closeModal}>
-      <View style={styles.overlay}>
-        <View style={styles.modalCard}>
-          <View style={styles.headerRow}>
-            <View style={styles.iconBadge}>
-              <LockKeyhole size={24} color={colors.accent} strokeWidth={2.6} />
+      <KeyboardAvoidingView style={styles.overlay} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
+        <ScrollView
+          keyboardShouldPersistTaps="handled"
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={[styles.overlayContent, { padding: pagePadding, minHeight: height }]}
+        >
+          <View style={[styles.modalCard, isPhone && styles.modalCardPhone]}>
+            <View style={[styles.headerRow, isPhone && styles.headerRowPhone]}>
+              <View style={[styles.iconBadge, isPhone && styles.iconBadgePhone]}>
+                <LockKeyhole size={isPhone ? 21 : 24} color={colors.accent} strokeWidth={2.6} />
+              </View>
+              <View style={styles.headerCopy}>
+                <Text style={styles.kicker}>Acesso interno</Text>
+                <Text style={[styles.title, isPhone && styles.titlePhone]}>Login Rivalis</Text>
+              </View>
+              <Pressable onPress={closeModal} style={({ pressed }) => [styles.closeButton, pressed && styles.pressed]}>
+                <X size={20} color={colors.textPrimary} strokeWidth={2.5} />
+              </Pressable>
             </View>
-            <View style={styles.headerCopy}>
-              <Text style={styles.kicker}>Acesso interno</Text>
-              <Text style={styles.title}>Login Rivalis</Text>
+
+            <Text style={[styles.description, isPhone && styles.descriptionPhone]}>
+              Autenticação simulada para demonstrar o fluxo de acesso dos colaboradores. Em uma implantação real, esta etapa pode ser conectada ao login corporativo.
+            </Text>
+
+            <View style={[styles.authFlowCard, isPhone && styles.authFlowCardPhone]}>
+              <View style={[styles.authStep, isPhone && styles.authStepPhone, styles.authStepActive]}>
+                <Text style={styles.authStepNumber}>1</Text>
+                <Text style={styles.authStepText}>Credenciais</Text>
+              </View>
+              <View style={[styles.authStep, isPhone && styles.authStepPhone, status !== 'idle' && styles.authStepActive]}>
+                <Text style={styles.authStepNumber}>2</Text>
+                <Text style={styles.authStepText}>Validação</Text>
+              </View>
+              <View style={[styles.authStep, isPhone && styles.authStepPhone, status === 'success' && styles.authStepActive]}>
+                <Text style={styles.authStepNumber}>3</Text>
+                <Text style={styles.authStepText}>Acesso liberado</Text>
+              </View>
             </View>
-            <Pressable onPress={closeModal} style={({ pressed }) => [styles.closeButton, pressed && styles.pressed]}>
-              <X size={20} color={colors.textPrimary} strokeWidth={2.5} />
-            </Pressable>
+
+            <View style={styles.inputGroup}>
+              <Text style={styles.label}>Nome do colaborador</Text>
+              <View style={styles.inputShell}>
+                <User size={18} color={colors.accent} strokeWidth={2.4} />
+                <TextInput
+                  value={name}
+                  onChangeText={setName}
+                  placeholder="Ex: Augusto Rocha"
+                  placeholderTextColor={colors.textMuted}
+                  autoCapitalize="words"
+                  style={styles.input}
+                />
+              </View>
+            </View>
+
+            <View style={styles.inputGroup}>
+              <Text style={styles.label}>Email corporativo</Text>
+              <View style={styles.inputShell}>
+                <Mail size={18} color={colors.accent} strokeWidth={2.4} />
+                <TextInput
+                  value={email}
+                  onChangeText={setEmail}
+                  placeholder="nome.sobrenome@empresa.com"
+                  placeholderTextColor={colors.textMuted}
+                  keyboardType="email-address"
+                  autoCapitalize="none"
+                  style={styles.input}
+                />
+              </View>
+            </View>
+
+            <View style={styles.inputGroup}>
+              <Text style={styles.label}>Senha</Text>
+              <View style={styles.inputShell}>
+                <ShieldCheck size={18} color={colors.accent} strokeWidth={2.4} />
+                <TextInput
+                  value={password}
+                  onChangeText={setPassword}
+                  placeholder="Digite qualquer senha para simular"
+                  placeholderTextColor={colors.textMuted}
+                  secureTextEntry
+                  style={styles.input}
+                />
+              </View>
+            </View>
+
+            {message ? <Text style={[styles.message, status === 'success' && styles.successMessage]}>{message}</Text> : null}
+
+            <View style={styles.actions}>
+              <AnimatedButton label={status === 'loading' ? 'Autenticando...' : 'Entrar'} onPress={handleLogin} style={styles.fullWidth} />
+              <Pressable onPress={closeModal} style={({ pressed }) => [styles.secondaryButton, pressed && styles.pressed]}>
+                <Text style={styles.secondaryButtonText}>Cancelar</Text>
+              </Pressable>
+            </View>
           </View>
-
-          <Text style={styles.description}>
-            Autenticação simulada para demonstrar o fluxo de acesso dos colaboradores. Em uma implantação real, esta etapa pode ser conectada ao login corporativo.
-          </Text>
-
-          <View style={styles.authFlowCard}>
-            <View style={[styles.authStep, styles.authStepActive]}>
-              <Text style={styles.authStepNumber}>1</Text>
-              <Text style={styles.authStepText}>Credenciais</Text>
-            </View>
-            <View style={[styles.authStep, status !== 'idle' && styles.authStepActive]}>
-              <Text style={styles.authStepNumber}>2</Text>
-              <Text style={styles.authStepText}>Validação</Text>
-            </View>
-            <View style={[styles.authStep, status === 'success' && styles.authStepActive]}>
-              <Text style={styles.authStepNumber}>3</Text>
-              <Text style={styles.authStepText}>Acesso liberado</Text>
-            </View>
-          </View>
-
-          <View style={styles.inputGroup}>
-            <Text style={styles.label}>Nome do colaborador</Text>
-            <View style={styles.inputShell}>
-              <User size={18} color={colors.accent} strokeWidth={2.4} />
-              <TextInput
-                value={name}
-                onChangeText={setName}
-                placeholder="Ex: Nome Sobrenome"
-                placeholderTextColor={colors.textMuted}
-                autoCapitalize="words"
-                style={styles.input}
-              />
-            </View>
-          </View>
-
-          <View style={styles.inputGroup}>
-            <Text style={styles.label}>Email corporativo</Text>
-            <View style={styles.inputShell}>
-              <Mail size={18} color={colors.accent} strokeWidth={2.4} />
-              <TextInput
-                value={email}
-                onChangeText={setEmail}
-                placeholder="nome.sobrenome@empresa.com"
-                placeholderTextColor={colors.textMuted}
-                keyboardType="email-address"
-                autoCapitalize="none"
-                style={styles.input}
-              />
-            </View>
-          </View>
-
-          <View style={styles.inputGroup}>
-            <Text style={styles.label}>Senha</Text>
-            <View style={styles.inputShell}>
-              <ShieldCheck size={18} color={colors.accent} strokeWidth={2.4} />
-              <TextInput
-                value={password}
-                onChangeText={setPassword}
-                placeholder="Digite qualquer senha para simular"
-                placeholderTextColor={colors.textMuted}
-                secureTextEntry
-                style={styles.input}
-              />
-            </View>
-          </View>
-
-          {message ? <Text style={[styles.message, status === 'success' && styles.successMessage]}>{message}</Text> : null}
-
-          <View style={styles.actions}>
-            <AnimatedButton label={status === 'loading' ? 'Autenticando...' : 'Entrar'} onPress={handleLogin} />
-            <Pressable onPress={closeModal} style={({ pressed }) => [styles.secondaryButton, pressed && styles.pressed]}>
-              <Text style={styles.secondaryButtonText}>Cancelar</Text>
-            </Pressable>
-          </View>
-        </View>
-      </View>
+        </ScrollView>
+      </KeyboardAvoidingView>
     </Modal>
   );
 }
@@ -184,7 +192,9 @@ export function LoginModal({ visible, onClose, onAuthenticated }: LoginModalProp
 const styles = StyleSheet.create({
   overlay: {
     flex: 1,
-    padding: spacing.lg,
+    backgroundColor: colors.background,
+  },
+  overlayContent: {
     alignItems: 'center',
     justifyContent: 'center',
     backgroundColor: colors.background,
@@ -199,10 +209,17 @@ const styles = StyleSheet.create({
     backgroundColor: colors.surface,
     ...shadows.card,
   },
+  modalCardPhone: {
+    padding: spacing.lg,
+    borderRadius: radius.lg,
+  },
   headerRow: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: spacing.md,
+  },
+  headerRowPhone: {
+    gap: spacing.sm,
   },
   iconBadge: {
     width: 52,
@@ -213,6 +230,11 @@ const styles = StyleSheet.create({
     backgroundColor: colors.surfaceElevated,
     borderWidth: 1,
     borderColor: 'rgba(0,174,239,0.34)',
+  },
+  iconBadgePhone: {
+    width: 44,
+    height: 44,
+    borderRadius: 15,
   },
   headerCopy: {
     flex: 1,
@@ -229,6 +251,9 @@ const styles = StyleSheet.create({
     fontFamily: fonts.headingBold,
     color: colors.textPrimary,
     fontSize: 26,
+  },
+  titlePhone: {
+    fontSize: 22,
   },
   closeButton: {
     width: 40,
@@ -247,6 +272,10 @@ const styles = StyleSheet.create({
     fontSize: 14,
     lineHeight: 22,
   },
+  descriptionPhone: {
+    fontSize: 13,
+    lineHeight: 20,
+  },
   authFlowCard: {
     marginTop: spacing.lg,
     padding: spacing.md,
@@ -258,6 +287,9 @@ const styles = StyleSheet.create({
     flexWrap: 'wrap',
     gap: spacing.sm,
   },
+  authFlowCardPhone: {
+    flexDirection: 'column',
+  },
   authStep: {
     flex: 1,
     minWidth: 130,
@@ -267,6 +299,10 @@ const styles = StyleSheet.create({
     backgroundColor: colors.surface,
     borderWidth: 1,
     borderColor: colors.border,
+  },
+  authStepPhone: {
+    minWidth: 0,
+    width: '100%',
   },
   authStepActive: {
     borderColor: colors.accent,
@@ -325,6 +361,9 @@ const styles = StyleSheet.create({
   actions: {
     marginTop: spacing.xl,
     gap: spacing.md,
+  },
+  fullWidth: {
+    width: '100%',
   },
   secondaryButton: {
     minHeight: 50,

@@ -5,6 +5,7 @@ import { BarChart3, DatabaseZap, Gauge, LineChart, Route, ShieldAlert, SlidersHo
 
 import { BulletRow, InfoCard, PageSection, RivalisPageLayout } from '../components/RivalisPageLayout';
 import { colors, fonts, gradients, radius, shadows, spacing } from '../theme';
+import { useResponsive } from '../theme/responsive';
 
 const indicators = [
   {
@@ -41,6 +42,8 @@ const interpretations = [
 ];
 
 export function AnalysesScreen() {
+  const { isPhone } = useResponsive();
+
   return (
     <RivalisPageLayout
       kicker="Análises"
@@ -48,11 +51,11 @@ export function AnalysesScreen() {
       description="Esta página aprofunda a lógica de análise do MVP: indicadores técnicos, visualização em cards, interpretação de diferenças percentuais e limites da ferramenta para uso interno."
     >
       <PageSection kicker="Indicadores" title="Métricas principais do MVP.">
-        <View style={styles.grid}>
+        <View style={[styles.grid, isPhone && styles.gridPhone]}>
           {indicators.map((item) => {
             const Icon = item.icon;
             return (
-              <LinearGradient key={item.title} colors={gradients.card} style={styles.indicatorCard}>
+              <LinearGradient key={item.title} colors={gradients.card} style={[styles.indicatorCard, isPhone && styles.fullWidth, isPhone && styles.indicatorCardPhone]}>
                 <View style={styles.indicatorHeader}>
                   <View style={styles.iconBox}>
                     <Icon size={24} color={colors.accent} strokeWidth={2.5} />
@@ -72,18 +75,18 @@ export function AnalysesScreen() {
         title="Por que cards e barras ajudam no uso corporativo."
         description="A ideia não é substituir uma planilha completa. A proposta é criar uma camada de leitura rápida, boa para consulta, apresentação e treinamento."
       >
-        <LinearGradient colors={gradients.premiumPanel} style={styles.visualPanel}>
-          <View style={styles.visualColumn}>
+        <LinearGradient colors={gradients.premiumPanel} style={[styles.visualPanel, isPhone && styles.visualPanelPhone]}>
+          <View style={[styles.visualColumn, isPhone && styles.fullWidth]}>
             <LineChart size={36} color={colors.accent} strokeWidth={2.4} />
             <Text style={styles.visualTitle}>Leitura imediata</Text>
             <Text style={styles.visualText}>O colaborador entende rapidamente se há vantagem, equilíbrio ou ponto de atenção.</Text>
           </View>
-          <View style={styles.visualColumn}>
+          <View style={[styles.visualColumn, isPhone && styles.fullWidth]}>
             <SlidersHorizontal size={36} color={colors.accent} strokeWidth={2.4} />
             <Text style={styles.visualTitle}>Comparação padronizada</Text>
             <Text style={styles.visualText}>A mesma lógica de cards reduz interpretações diferentes entre equipes.</Text>
           </View>
-          <View style={styles.visualColumn}>
+          <View style={[styles.visualColumn, isPhone && styles.fullWidth]}>
             <DatabaseZap size={36} color={colors.accent} strokeWidth={2.4} />
             <Text style={styles.visualTitle}>Base evolutiva</Text>
             <Text style={styles.visualText}>O MVP pode começar com poucos indicadores e evoluir para preço, versões, consumo e equipamentos.</Text>
@@ -92,7 +95,7 @@ export function AnalysesScreen() {
       </PageSection>
 
       <PageSection kicker="Interpretação" title="Como ler os resultados sem perder contexto.">
-        <LinearGradient colors={gradients.card} style={styles.bulletPanel}>
+        <LinearGradient colors={gradients.card} style={[styles.bulletPanel, isPhone && styles.bulletPanelPhone]}>
           {interpretations.map((item) => (
             <BulletRow key={item} text={item} />
           ))}
@@ -100,7 +103,7 @@ export function AnalysesScreen() {
       </PageSection>
 
       <PageSection kicker="Limites" title="O que precisa ficar claro na apresentação.">
-        <View style={styles.grid}>
+        <View style={[styles.grid, isPhone && styles.gridPhone]}>
           <InfoCard title="MVP demonstrativo" description="A lógica atual mostra o potencial da experiência. Para uso real, a base deve ser validada e governada." icon={ShieldAlert} />
           <InfoCard title="Não é recomendador de compra" description="A solução apoia colaboradores com análise técnica e competitiva, não substitui decisão comercial, estratégia ou material oficial." icon={Route} />
         </View>
@@ -110,6 +113,7 @@ export function AnalysesScreen() {
 }
 
 const styles = StyleSheet.create({
+  fullWidth: { width: '100%', minWidth: 0, flex: 0 },
   grid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
@@ -123,6 +127,9 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: colors.border,
     ...shadows.card,
+  },
+  indicatorCardPhone: {
+    padding: spacing.lg,
   },
   indicatorHeader: {
     flexDirection: 'row',
@@ -165,6 +172,11 @@ const styles = StyleSheet.create({
     flexWrap: 'wrap',
     gap: spacing.lg,
   },
+  visualPanelPhone: {
+    padding: spacing.lg,
+    borderRadius: radius.lg,
+    flexDirection: 'column',
+  },
   visualColumn: {
     flex: 1,
     minWidth: 240,
@@ -192,5 +204,12 @@ const styles = StyleSheet.create({
     padding: spacing.xl,
     borderWidth: 1,
     borderColor: colors.border,
+  },
+  bulletPanelPhone: {
+    padding: spacing.lg,
+    borderRadius: radius.lg,
+  },
+  gridPhone: {
+    flexDirection: 'column',
   },
 });

@@ -5,6 +5,7 @@ import { BriefcaseBusiness, ClipboardCheck, GraduationCap, Headset, Radar, Shiel
 
 import { BulletRow, InfoCard, PageSection, RivalisPageLayout } from '../components/RivalisPageLayout';
 import { colors, fonts, gradients, radius, shadows, spacing } from '../theme';
+import { useResponsive } from '../theme/responsive';
 
 const audiences = [
   {
@@ -38,6 +39,8 @@ const usageMoments = [
 ];
 
 export function InternalUseScreen() {
+  const { isPhone } = useResponsive();
+
   return (
     <RivalisPageLayout
       kicker="Uso interno"
@@ -49,12 +52,12 @@ export function InternalUseScreen() {
         title="De landing para consumidor final para cockpit interno de comparação."
         description="O Rivalis passa a ser apresentado como uma camada visual que organiza informações técnicas e ajuda colaboradores a entenderem rapidamente como modelos Ford se posicionam contra concorrentes relevantes."
       >
-        <LinearGradient colors={gradients.premiumPanel} style={styles.featurePanel}>
+        <LinearGradient colors={gradients.premiumPanel} style={[styles.featurePanel, isPhone && styles.featurePanelPhone]}>
           <View style={styles.featureIcon}>
             <Radar size={30} color={colors.accent} strokeWidth={2.6} />
           </View>
-          <View style={styles.featureCopy}>
-            <Text style={styles.featureTitle}>O objetivo é apoiar o trabalho, não substituir material oficial.</Text>
+          <View style={[styles.featureCopy, isPhone && styles.fullWidth]}>
+            <Text style={[styles.featureTitle, isPhone && styles.featureTitlePhone]}>O objetivo é apoiar o trabalho, não substituir material oficial.</Text>
             <Text style={styles.featureText}>
               O Rivalis funciona como uma interface de consulta e apresentação. Ele pode resumir dados, destacar diferenças e facilitar a interpretação, mas as informações precisam ser validadas por fontes oficiais antes de uso corporativo real.
             </Text>
@@ -63,7 +66,7 @@ export function InternalUseScreen() {
       </PageSection>
 
       <PageSection kicker="Quem usa" title="Times que podem se beneficiar do MVP.">
-        <View style={styles.grid}>
+        <View style={[styles.grid, isPhone && styles.gridPhone]}>
           {audiences.map((item) => (
             <InfoCard key={item.title} title={item.title} description={item.description} icon={item.icon} />
           ))}
@@ -75,7 +78,7 @@ export function InternalUseScreen() {
         title="Onde o Rivalis entra no dia a dia."
         description="A proposta é tornar o acesso à comparação mais rápido, visual e consistente, principalmente quando o colaborador precisa transformar ficha técnica em argumento ou contexto."
       >
-        <LinearGradient colors={gradients.card} style={styles.bulletPanel}>
+        <LinearGradient colors={gradients.card} style={[styles.bulletPanel, isPhone && styles.bulletPanelPhone]}>
           {usageMoments.map((item) => (
             <BulletRow key={item} text={item} />
           ))}
@@ -83,7 +86,7 @@ export function InternalUseScreen() {
       </PageSection>
 
       <PageSection kicker="Governança" title="Cuidados antes de uma implantação real.">
-        <View style={styles.grid}>
+        <View style={[styles.grid, isPhone && styles.gridPhone]}>
           <InfoCard title="Base validada" description="Dados de potência, torque, versões e categorias devem ser revisados periodicamente por uma fonte confiável." icon={ClipboardCheck} />
           <InfoCard title="Uso complementar" description="A ferramenta apoia treinamentos e consultas, mas não substitui catálogos, materiais oficiais ou políticas internas." icon={ShieldCheck} />
         </View>
@@ -93,6 +96,7 @@ export function InternalUseScreen() {
 }
 
 const styles = StyleSheet.create({
+  fullWidth: { width: '100%', minWidth: 0, flex: 0 },
   featurePanel: {
     borderRadius: radius.xl,
     padding: spacing.xxl,
@@ -102,6 +106,11 @@ const styles = StyleSheet.create({
     flexWrap: 'wrap',
     gap: spacing.xl,
     ...shadows.card,
+  },
+  featurePanelPhone: {
+    padding: spacing.lg,
+    borderRadius: radius.lg,
+    flexDirection: 'column',
   },
   featureIcon: {
     width: 72,
@@ -123,6 +132,10 @@ const styles = StyleSheet.create({
     fontSize: 26,
     lineHeight: 33,
   },
+  featureTitlePhone: {
+    fontSize: 22,
+    lineHeight: 28,
+  },
   featureText: {
     marginTop: spacing.md,
     fontFamily: fonts.bodyMedium,
@@ -135,10 +148,17 @@ const styles = StyleSheet.create({
     flexWrap: 'wrap',
     gap: spacing.lg,
   },
+  gridPhone: {
+    flexDirection: 'column',
+  },
   bulletPanel: {
     borderRadius: radius.xl,
     padding: spacing.xl,
     borderWidth: 1,
     borderColor: colors.border,
+  },
+  bulletPanelPhone: {
+    padding: spacing.lg,
+    borderRadius: radius.lg,
   },
 });

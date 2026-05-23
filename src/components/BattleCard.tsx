@@ -7,6 +7,7 @@ import { Gauge, Zap, Timer, Trophy, ShieldAlert } from 'lucide-react-native';
 
 import type { BattleResult, ReferenceVehicle } from '../@types/car';
 import { colors, fonts, gradients, radius, shadows, spacing } from '../theme';
+import { useResponsive } from '../theme/responsive';
 import { SpecBar } from './SpecBar';
 
 type BattleCardProps = {
@@ -16,6 +17,7 @@ type BattleCardProps = {
 };
 
 export function BattleCard({ car, reference, index }: BattleCardProps) {
+  const { isPhone } = useResponsive();
   const statusLabel = car.rivalWinsBattle ? 'Concorrente acima da referência' : 'Modelo de referência em vantagem';
   const StatusIcon = car.rivalWinsBattle ? Trophy : ShieldAlert;
   const gradientColors = car.rivalWinsBattle ? gradients.cardWinner : gradients.cardLoser;
@@ -32,14 +34,14 @@ export function BattleCard({ car, reference, index }: BattleCardProps) {
       style={styles.motionWrapper}
     >
       <Pressable onPress={handlePress} style={({ pressed }) => [styles.pressable, pressed && styles.pressed]}>
-        <LinearGradient colors={gradientColors} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={styles.card}>
-          <View style={styles.topRow}>
+        <LinearGradient colors={gradientColors} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={[styles.card, isPhone && styles.cardPhone]}>
+          <View style={[styles.topRow, isPhone && styles.topRowPhone]}>
             <View style={styles.brandBlock}>
               <Text style={styles.brand}>{car.brand}</Text>
-              <Text style={styles.model}>{car.model}</Text>
+              <Text style={[styles.model, isPhone && styles.modelPhone]}>{car.model}</Text>
             </View>
 
-            <View style={[styles.statusPill, car.rivalWinsBattle ? styles.statusWin : styles.statusLose]}>
+            <View style={[styles.statusPill, isPhone && styles.statusPillPhone, car.rivalWinsBattle ? styles.statusWin : styles.statusLose]}>
               <StatusIcon size={14} color={car.rivalWinsBattle ? colors.accent : colors.silver} strokeWidth={2.5} />
               <Text style={[styles.statusText, car.rivalWinsBattle ? styles.statusTextWin : styles.statusTextLose]}>
                 {car.overallDiffPercent >= 0 ? '+' : ''}{car.overallDiffPercent}%
@@ -85,9 +87,9 @@ export function BattleCard({ car, reference, index }: BattleCardProps) {
             />
           </View>
 
-          <View style={styles.footerRow}>
+          <View style={[styles.footerRow, isPhone && styles.footerRowPhone]}>
             <Text style={styles.category}>{car.category}</Text>
-            <Text style={styles.statusCaption}>{statusLabel}</Text>
+            <Text style={[styles.statusCaption, isPhone && styles.statusCaptionPhone]}>{statusLabel}</Text>
           </View>
         </LinearGradient>
       </Pressable>
@@ -115,11 +117,18 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: colors.border,
   },
+  cardPhone: {
+    padding: spacing.md,
+  },
   topRow: {
     flexDirection: 'row',
     alignItems: 'flex-start',
     justifyContent: 'space-between',
     gap: spacing.lg,
+  },
+  topRowPhone: {
+    flexDirection: 'column',
+    gap: spacing.md,
   },
   brandBlock: {
     flex: 1,
@@ -138,6 +147,10 @@ const styles = StyleSheet.create({
     fontSize: 22,
     letterSpacing: -0.4,
   },
+  modelPhone: {
+    fontSize: 19,
+    lineHeight: 24,
+  },
   statusPill: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -146,6 +159,9 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.md,
     paddingVertical: spacing.sm,
     borderWidth: 1,
+  },
+  statusPillPhone: {
+    alignSelf: 'flex-start',
   },
   statusWin: {
     backgroundColor: 'rgba(0,229,255,0.10)',
@@ -209,6 +225,11 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     gap: spacing.md,
   },
+  footerRowPhone: {
+    flexDirection: 'column',
+    alignItems: 'flex-start',
+    gap: spacing.sm,
+  },
   category: {
     fontFamily: fonts.bodyBold,
     color: colors.textPrimary,
@@ -220,5 +241,9 @@ const styles = StyleSheet.create({
     fontFamily: fonts.bodyMedium,
     color: colors.textMuted,
     fontSize: 11,
+  },
+  statusCaptionPhone: {
+    flex: 0,
+    textAlign: 'left',
   },
 });

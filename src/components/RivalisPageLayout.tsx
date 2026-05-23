@@ -7,6 +7,7 @@ import { ArrowLeft, ExternalLink, LockKeyhole, Radar } from 'lucide-react-native
 
 import type { RootStackParamList } from '../@types/navigation';
 import { colors, fonts, gradients, radius, shadows, spacing } from '../theme';
+import { useResponsive } from '../theme/responsive';
 import { LoginModal } from './LoginModal';
 
 type Navigation = NativeStackNavigationProp<RootStackParamList>;
@@ -28,6 +29,7 @@ const pageLinks: Array<{ label: string; route: keyof RootStackParamList }> = [
 
 export function RivalisPageLayout({ kicker, title, description, children, showBackButton = true }: RivalisPageLayoutProps) {
   const navigation = useNavigation<Navigation>();
+  const { isPhone, isMobile, pagePadding, sectionGap } = useResponsive();
   const [loginVisible, setLoginVisible] = useState(false);
 
   const openExternal = (url: string) => {
@@ -38,18 +40,18 @@ export function RivalisPageLayout({ kicker, title, description, children, showBa
     <View style={styles.root}>
       <LinearGradient colors={gradients.appBackground} style={styles.background}>
         <SafeAreaView style={styles.safeArea}>
-          <View style={styles.navbar}>
-            <Pressable onPress={() => navigation.navigate('Home')} style={styles.brandArea}>
-              <View style={styles.logoMark}>
-                <Radar size={20} color={colors.accent} strokeWidth={2.7} />
+          <View style={[styles.navbar, isMobile && styles.navbarMobile, { paddingHorizontal: pagePadding }]}>
+            <Pressable onPress={() => navigation.navigate('Home')} style={[styles.brandArea, isMobile && styles.brandAreaMobile]}>
+              <View style={[styles.logoMark, isPhone && styles.logoMarkPhone]}>
+                <Radar size={isPhone ? 18 : 20} color={colors.accent} strokeWidth={2.7} />
               </View>
-              <View>
-                <Text style={styles.brandName}>RIVALIS</Text>
-                <Text style={styles.brandCaption}>Internal Vehicle Intelligence</Text>
+              <View style={styles.brandCopy}>
+                <Text style={[styles.brandName, isPhone && styles.brandNamePhone]}>RIVALIS</Text>
+                <Text style={[styles.brandCaption, isPhone && styles.brandCaptionPhone]}>Internal Vehicle Intelligence</Text>
               </View>
             </Pressable>
 
-            <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.navLinks}>
+            <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={[styles.navLinks, isMobile && styles.navLinksMobile]}>
               {pageLinks.map((item) => (
                 <Pressable key={item.route} onPress={() => navigation.navigate(item.route)} style={({ pressed }) => [styles.navLink, pressed && styles.pressed]}>
                   <Text style={styles.navLinkText}>{item.label}</Text>
@@ -65,8 +67,8 @@ export function RivalisPageLayout({ kicker, title, description, children, showBa
             </ScrollView>
           </View>
 
-          <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.content}>
-            <View style={styles.hero}>
+          <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={[styles.content, { paddingHorizontal: pagePadding, paddingBottom: sectionGap }]}>
+            <View style={[styles.hero, { paddingTop: isPhone ? spacing.xl : spacing.xxl, paddingBottom: isPhone ? spacing.xl : spacing.xxl }]}>
               {showBackButton ? (
                 <Pressable onPress={() => navigation.goBack()} style={({ pressed }) => [styles.backButton, pressed && styles.pressed]}>
                   <ArrowLeft size={18} color={colors.textPrimary} strokeWidth={2.6} />
@@ -75,20 +77,20 @@ export function RivalisPageLayout({ kicker, title, description, children, showBa
               ) : null}
 
               <Text style={styles.kicker}>{kicker}</Text>
-              <Text style={styles.title}>{title}</Text>
-              <Text style={styles.description}>{description}</Text>
+              <Text style={[styles.title, isMobile && styles.titleMobile, isPhone && styles.titlePhone]}>{title}</Text>
+              <Text style={[styles.description, isPhone && styles.descriptionPhone]}>{description}</Text>
             </View>
 
             {children}
 
-            <LinearGradient colors={gradients.premiumPanel} style={styles.footerShell}>
-              <View style={styles.footerTop}>
-                <View style={styles.footerBrandBlock}>
+            <LinearGradient colors={gradients.premiumPanel} style={[styles.footerShell, isPhone && styles.footerShellPhone]}>
+              <View style={[styles.footerTop, isMobile && styles.footerTopMobile]}>
+                <View style={[styles.footerBrandBlock, isMobile && styles.fullWidth]}>
                   <View style={styles.footerLogoRow}>
                     <View style={styles.footerLogoMark}>
                       <Radar size={22} color={colors.accent} strokeWidth={2.7} />
                     </View>
-                    <View>
+                    <View style={styles.brandCopy}>
                       <Text style={styles.footerBrand}>RIVALIS</Text>
                       <Text style={styles.footerSubBrand}>Internal Vehicle Intelligence</Text>
                     </View>
@@ -105,8 +107,8 @@ export function RivalisPageLayout({ kicker, title, description, children, showBa
                   </View>
                 </View>
 
-                <View style={styles.footerGrid}>
-                  <View style={styles.footerColumn}>
+                <View style={[styles.footerGrid, isMobile && styles.footerGridMobile]}>
+                  <View style={[styles.footerColumn, isPhone && styles.fullWidth]}>
                     <Text style={styles.footerColumnTitle}>Navegação</Text>
                     <Pressable onPress={() => navigation.navigate('Home')}><Text style={styles.footerLink}>Página inicial</Text></Pressable>
                     <Pressable onPress={() => navigation.navigate('UsoInterno')}><Text style={styles.footerLink}>Uso interno</Text></Pressable>
@@ -115,7 +117,7 @@ export function RivalisPageLayout({ kicker, title, description, children, showBa
                     <Pressable onPress={() => navigation.navigate('FAQ')}><Text style={styles.footerLink}>FAQ</Text></Pressable>
                   </View>
 
-                  <View style={styles.footerColumn}>
+                  <View style={[styles.footerColumn, isPhone && styles.fullWidth]}>
                     <Text style={styles.footerColumnTitle}>Aplicações</Text>
                     <Text style={styles.footerMutedLink}>Treinamento de produto</Text>
                     <Text style={styles.footerMutedLink}>Benchmarking competitivo</Text>
@@ -123,7 +125,7 @@ export function RivalisPageLayout({ kicker, title, description, children, showBa
                     <Text style={styles.footerMutedLink}>Consulta técnica rápida</Text>
                   </View>
 
-                  <View style={styles.footerColumn}>
+                  <View style={[styles.footerColumn, isPhone && styles.fullWidth]}>
                     <Text style={styles.footerColumnTitle}>Links</Text>
                     <Pressable onPress={() => openExternal('https://instagram.com/rivalis.app')} style={styles.externalLinkRow}>
                       <Text style={styles.footerLink}>Instagram</Text>
@@ -160,8 +162,10 @@ export function RivalisPageLayout({ kicker, title, description, children, showBa
 }
 
 export function InfoCard({ title, description, icon: Icon }: { title: string; description: string; icon?: React.ComponentType<{ size?: number; color?: string; strokeWidth?: number }> }) {
+  const { isPhone } = useResponsive();
+
   return (
-    <LinearGradient colors={gradients.card} style={styles.infoCard}>
+    <LinearGradient colors={gradients.card} style={[styles.infoCard, isPhone && styles.fullWidth, isPhone && styles.infoCardPhone]}>
       {Icon ? (
         <View style={styles.cardIconBox}>
           <Icon size={24} color={colors.accent} strokeWidth={2.5} />
@@ -174,10 +178,12 @@ export function InfoCard({ title, description, icon: Icon }: { title: string; de
 }
 
 export function PageSection({ kicker, title, description, children }: { kicker?: string; title: string; description?: string; children?: React.ReactNode }) {
+  const { isPhone, sectionGap } = useResponsive();
+
   return (
-    <View style={styles.pageSection}>
+    <View style={[styles.pageSection, { marginBottom: sectionGap }]}>
       {kicker ? <Text style={styles.sectionKicker}>{kicker}</Text> : null}
-      <Text style={styles.sectionTitle}>{title}</Text>
+      <Text style={[styles.sectionTitle, isPhone && styles.sectionTitlePhone]}>{title}</Text>
       {description ? <Text style={styles.sectionDescription}>{description}</Text> : null}
       {children ? <View style={styles.sectionChildren}>{children}</View> : null}
     </View>
@@ -194,376 +200,85 @@ export function BulletRow({ text }: { text: string }) {
 }
 
 const styles = StyleSheet.create({
-  root: {
-    flex: 1,
-    backgroundColor: colors.background,
-  },
-  background: {
-    flex: 1,
-  },
-  safeArea: {
-    flex: 1,
-  },
+  root: { flex: 1, backgroundColor: colors.background },
+  background: { flex: 1 },
+  safeArea: { flex: 1 },
   navbar: {
     minHeight: 74,
-    paddingHorizontal: spacing.lg,
     paddingVertical: spacing.md,
-    backgroundColor: 'rgba(7,17,31,0.92)',
+    backgroundColor: 'rgba(7,17,31,0.94)',
     borderBottomWidth: 1,
     borderBottomColor: colors.border,
     flexDirection: 'row',
     alignItems: 'center',
     gap: spacing.md,
   },
-  brandArea: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: spacing.md,
-    minWidth: 194,
-  },
-  logoMark: {
-    width: 42,
-    height: 42,
-    borderRadius: 15,
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: colors.accentSoft,
-    borderWidth: 1,
-    borderColor: 'rgba(0,174,239,0.36)',
-  },
-  brandName: {
-    fontFamily: fonts.headingBold,
-    color: colors.textPrimary,
-    fontSize: 16,
-    letterSpacing: 2.8,
-  },
-  brandCaption: {
-    marginTop: 2,
-    fontFamily: fonts.bodyMedium,
-    color: colors.textMuted,
-    fontSize: 10,
-    letterSpacing: 0.4,
-  },
-  navLinks: {
-    flexGrow: 1,
-    alignItems: 'center',
-    justifyContent: 'flex-end',
-    gap: spacing.sm,
-    paddingLeft: spacing.md,
-  },
-  navLink: {
-    minHeight: 38,
-    paddingHorizontal: spacing.md,
-    borderRadius: radius.pill,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  navLinkText: {
-    fontFamily: fonts.bodySemiBold,
-    color: colors.textSecondary,
-    fontSize: 12,
-  },
-  navCta: {
-    minHeight: 38,
-    paddingHorizontal: spacing.lg,
-    borderRadius: radius.pill,
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: colors.accent,
-    ...shadows.cyanGlow,
-  },
-  navCtaText: {
-    fontFamily: fonts.bodyBold,
-    color: colors.textPrimary,
-    fontSize: 12,
-    textTransform: 'uppercase',
-    letterSpacing: 0.4,
-  },
-  loginButton: {
-    minHeight: 38,
-    paddingHorizontal: spacing.lg,
-    borderRadius: radius.pill,
-    alignItems: 'center',
-    justifyContent: 'center',
-    flexDirection: 'row',
-    gap: spacing.sm,
-    backgroundColor: colors.glass,
-    borderWidth: 1,
-    borderColor: colors.border,
-  },
-  loginButtonText: {
-    fontFamily: fonts.bodyBold,
-    color: colors.silver,
-    fontSize: 12,
-    textTransform: 'uppercase',
-    letterSpacing: 0.4,
-  },
-  pressed: {
-    opacity: 0.78,
-    transform: [{ scale: 0.98 }],
-  },
-  content: {
-    paddingHorizontal: spacing.lg,
-    paddingBottom: spacing.huge,
-  },
-  hero: {
-    width: '100%',
-    maxWidth: 1180,
-    alignSelf: 'center',
-    paddingTop: spacing.xxl,
-    paddingBottom: spacing.xxl,
-  },
-  backButton: {
-    alignSelf: 'flex-start',
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: spacing.sm,
-    paddingVertical: spacing.sm,
-    paddingHorizontal: spacing.md,
-    borderRadius: radius.pill,
-    backgroundColor: colors.glass,
-    borderWidth: 1,
-    borderColor: colors.border,
-    marginBottom: spacing.xl,
-  },
-  backButtonText: {
-    fontFamily: fonts.bodySemiBold,
-    color: colors.silver,
-    fontSize: 13,
-  },
-  kicker: {
-    fontFamily: fonts.bodyBold,
-    color: colors.accent,
-    fontSize: 12,
-    textTransform: 'uppercase',
-    letterSpacing: 1.8,
-    marginBottom: spacing.md,
-  },
-  title: {
-    fontFamily: fonts.headingBold,
-    color: colors.textPrimary,
-    fontSize: 44,
-    lineHeight: 52,
-    letterSpacing: -1.4,
-    maxWidth: 980,
-  },
-  description: {
-    marginTop: spacing.lg,
-    fontFamily: fonts.bodyMedium,
-    color: colors.textSecondary,
-    fontSize: 16,
-    lineHeight: 26,
-    maxWidth: 860,
-  },
-  pageSection: {
-    width: '100%',
-    maxWidth: 1180,
-    alignSelf: 'center',
-    marginBottom: spacing.huge,
-  },
-  sectionKicker: {
-    fontFamily: fonts.bodyBold,
-    color: colors.accent,
-    fontSize: 12,
-    textTransform: 'uppercase',
-    letterSpacing: 1.5,
-    marginBottom: spacing.sm,
-  },
-  sectionTitle: {
-    fontFamily: fonts.headingBold,
-    color: colors.textPrimary,
-    fontSize: 30,
-    lineHeight: 38,
-    letterSpacing: -0.8,
-  },
-  sectionDescription: {
-    marginTop: spacing.md,
-    fontFamily: fonts.bodyMedium,
-    color: colors.textSecondary,
-    fontSize: 15,
-    lineHeight: 24,
-    maxWidth: 880,
-  },
-  sectionChildren: {
-    marginTop: spacing.xl,
-  },
-  infoCard: {
-    flex: 1,
-    minWidth: 250,
-    borderRadius: radius.lg,
-    padding: spacing.xl,
-    borderWidth: 1,
-    borderColor: colors.border,
-  },
-  cardIconBox: {
-    width: 52,
-    height: 52,
-    borderRadius: 18,
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: colors.accentSoft,
-    marginBottom: spacing.lg,
-  },
-  infoCardTitle: {
-    fontFamily: fonts.heading,
-    color: colors.textPrimary,
-    fontSize: 20,
-    lineHeight: 26,
-  },
-  infoCardDescription: {
-    marginTop: spacing.sm,
-    fontFamily: fonts.bodyMedium,
-    color: colors.textSecondary,
-    fontSize: 14,
-    lineHeight: 22,
-  },
-  bulletRow: {
-    flexDirection: 'row',
-    gap: spacing.md,
-    alignItems: 'flex-start',
-    marginBottom: spacing.md,
-  },
-  bulletDot: {
-    width: 9,
-    height: 9,
-    borderRadius: 5,
-    backgroundColor: colors.accent,
-    marginTop: 6,
-  },
-  bulletText: {
-    flex: 1,
-    fontFamily: fonts.bodyMedium,
-    color: colors.textSecondary,
-    fontSize: 15,
-    lineHeight: 23,
-  },
-  footerShell: {
-    width: '100%',
-    maxWidth: 1180,
-    alignSelf: 'center',
-    borderRadius: radius.xl,
-    borderWidth: 1,
-    borderColor: colors.border,
-    padding: spacing.xl,
-    marginTop: spacing.lg,
-    ...shadows.card,
-  },
-  footerTop: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: spacing.xxl,
-  },
-  footerBrandBlock: {
-    flex: 1,
-    minWidth: 280,
-  },
-  footerLogoRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: spacing.md,
-  },
-  footerLogoMark: {
-    width: 48,
-    height: 48,
-    borderRadius: 16,
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: colors.accentSoft,
-    borderWidth: 1,
-    borderColor: 'rgba(0,174,239,0.36)',
-  },
-  footerBrand: {
-    fontFamily: fonts.headingBold,
-    color: colors.textPrimary,
-    fontSize: 18,
-    letterSpacing: 3,
-  },
-  footerSubBrand: {
-    fontFamily: fonts.bodyMedium,
-    color: colors.textMuted,
-    fontSize: 11,
-    marginTop: 2,
-  },
-  footerText: {
-    marginTop: spacing.lg,
-    fontFamily: fonts.bodyMedium,
-    color: colors.textSecondary,
-    fontSize: 14,
-    lineHeight: 23,
-    maxWidth: 460,
-  },
-  footerBadges: {
-    marginTop: spacing.lg,
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: spacing.sm,
-  },
-  footerBadge: {
-    paddingVertical: spacing.sm,
-    paddingHorizontal: spacing.md,
-    borderRadius: radius.pill,
-    backgroundColor: colors.accentSoft,
-    borderWidth: 1,
-    borderColor: 'rgba(0,174,239,0.28)',
-  },
-  footerBadgeText: {
-    fontFamily: fonts.bodyBold,
-    color: colors.accent,
-    fontSize: 11,
-  },
-  footerGrid: {
-    flex: 1.2,
-    minWidth: 320,
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: spacing.xl,
-  },
-  footerColumn: {
-    minWidth: 150,
-    gap: spacing.sm,
-  },
-  footerColumnTitle: {
-    fontFamily: fonts.bodyBold,
-    color: colors.textPrimary,
-    fontSize: 13,
-    textTransform: 'uppercase',
-    letterSpacing: 1,
-    marginBottom: spacing.sm,
-  },
-  footerLink: {
-    fontFamily: fonts.bodySemiBold,
-    color: colors.accent,
-    fontSize: 13,
-    lineHeight: 22,
-  },
-  footerMutedLink: {
-    fontFamily: fonts.bodyMedium,
-    color: colors.textSecondary,
-    fontSize: 13,
-    lineHeight: 22,
-  },
-  externalLinkRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: spacing.xs,
-  },
-  footerDivider: {
-    height: 1,
-    backgroundColor: colors.border,
-    marginVertical: spacing.xl,
-  },
-  footerBottom: {
-    gap: spacing.sm,
-  },
-  footerLegal: {
-    fontFamily: fonts.bodyBold,
-    color: colors.silver,
-    fontSize: 13,
-  },
-  footerDisclaimer: {
-    fontFamily: fonts.bodyMedium,
-    color: colors.textMuted,
-    fontSize: 12,
-    lineHeight: 19,
-  },
+  navbarMobile: { flexDirection: 'column', alignItems: 'stretch', gap: spacing.sm },
+  brandArea: { flexDirection: 'row', alignItems: 'center', gap: spacing.md, minWidth: 194 },
+  brandAreaMobile: { minWidth: 0, width: '100%' },
+  brandCopy: { flexShrink: 1 },
+  logoMark: { width: 42, height: 42, borderRadius: 15, alignItems: 'center', justifyContent: 'center', backgroundColor: colors.accentSoft, borderWidth: 1, borderColor: 'rgba(0,174,239,0.36)' },
+  logoMarkPhone: { width: 38, height: 38, borderRadius: 14 },
+  brandName: { fontFamily: fonts.headingBold, color: colors.textPrimary, fontSize: 16, letterSpacing: 2.8 },
+  brandNamePhone: { fontSize: 15, letterSpacing: 2.2 },
+  brandCaption: { marginTop: 2, fontFamily: fonts.bodyMedium, color: colors.textMuted, fontSize: 10, letterSpacing: 0.4 },
+  brandCaptionPhone: { fontSize: 9 },
+  navLinks: { flexGrow: 1, alignItems: 'center', justifyContent: 'flex-end', gap: spacing.sm, paddingLeft: spacing.md, paddingRight: spacing.md },
+  navLinksMobile: { justifyContent: 'flex-start', paddingLeft: 0, paddingRight: spacing.lg, paddingVertical: spacing.xs },
+  navLink: { minHeight: 38, paddingHorizontal: spacing.md, borderRadius: radius.pill, alignItems: 'center', justifyContent: 'center' },
+  navLinkText: { fontFamily: fonts.bodySemiBold, color: colors.textSecondary, fontSize: 12 },
+  navCta: { minHeight: 38, paddingHorizontal: spacing.lg, borderRadius: radius.pill, alignItems: 'center', justifyContent: 'center', backgroundColor: colors.accent, ...shadows.cyanGlow },
+  navCtaText: { fontFamily: fonts.bodyBold, color: colors.textPrimary, fontSize: 12, textTransform: 'uppercase', letterSpacing: 0.4 },
+  loginButton: { minHeight: 38, paddingHorizontal: spacing.lg, borderRadius: radius.pill, alignItems: 'center', justifyContent: 'center', flexDirection: 'row', gap: spacing.sm, backgroundColor: colors.glass, borderWidth: 1, borderColor: colors.border },
+  loginButtonText: { fontFamily: fonts.bodyBold, color: colors.silver, fontSize: 12, textTransform: 'uppercase', letterSpacing: 0.4 },
+  pressed: { opacity: 0.78, transform: [{ scale: 0.98 }] },
+  content: { paddingBottom: spacing.huge },
+  hero: { width: '100%', maxWidth: 1180, alignSelf: 'center' },
+  backButton: { alignSelf: 'flex-start', flexDirection: 'row', alignItems: 'center', gap: spacing.sm, paddingVertical: spacing.sm, paddingHorizontal: spacing.md, borderRadius: radius.pill, backgroundColor: colors.glass, borderWidth: 1, borderColor: colors.border, marginBottom: spacing.xl },
+  backButtonText: { fontFamily: fonts.bodySemiBold, color: colors.silver, fontSize: 13 },
+  kicker: { fontFamily: fonts.bodyBold, color: colors.accent, fontSize: 12, textTransform: 'uppercase', letterSpacing: 1.8, marginBottom: spacing.md },
+  title: { fontFamily: fonts.headingBold, color: colors.textPrimary, fontSize: 44, lineHeight: 52, letterSpacing: -1.4, maxWidth: 980 },
+  titleMobile: { fontSize: 35, lineHeight: 42 },
+  titlePhone: { fontSize: 27, lineHeight: 34, letterSpacing: -0.7 },
+  description: { marginTop: spacing.lg, fontFamily: fonts.bodyMedium, color: colors.textSecondary, fontSize: 16, lineHeight: 26, maxWidth: 860 },
+  descriptionPhone: { fontSize: 14, lineHeight: 22 },
+  pageSection: { width: '100%', maxWidth: 1180, alignSelf: 'center' },
+  sectionKicker: { fontFamily: fonts.bodyBold, color: colors.accent, fontSize: 12, textTransform: 'uppercase', letterSpacing: 1.5, marginBottom: spacing.sm },
+  sectionTitle: { fontFamily: fonts.headingBold, color: colors.textPrimary, fontSize: 30, lineHeight: 38, letterSpacing: -0.8 },
+  sectionTitlePhone: { fontSize: 24, lineHeight: 31 },
+  sectionDescription: { marginTop: spacing.md, fontFamily: fonts.bodyMedium, color: colors.textSecondary, fontSize: 15, lineHeight: 24, maxWidth: 880 },
+  sectionChildren: { marginTop: spacing.xl },
+  infoCard: { flex: 1, minWidth: 250, borderRadius: radius.lg, padding: spacing.xl, borderWidth: 1, borderColor: colors.border },
+  infoCardPhone: { padding: spacing.lg },
+  fullWidth: { width: '100%', minWidth: 0, flex: 0 },
+  cardIconBox: { width: 52, height: 52, borderRadius: 18, alignItems: 'center', justifyContent: 'center', backgroundColor: colors.accentSoft, marginBottom: spacing.lg },
+  infoCardTitle: { fontFamily: fonts.heading, color: colors.textPrimary, fontSize: 20, lineHeight: 26 },
+  infoCardDescription: { marginTop: spacing.sm, fontFamily: fonts.bodyMedium, color: colors.textSecondary, fontSize: 14, lineHeight: 22 },
+  bulletRow: { flexDirection: 'row', gap: spacing.md, alignItems: 'flex-start', marginBottom: spacing.md },
+  bulletDot: { width: 9, height: 9, borderRadius: 5, backgroundColor: colors.accent, marginTop: 6 },
+  bulletText: { flex: 1, fontFamily: fonts.bodyMedium, color: colors.textSecondary, fontSize: 15, lineHeight: 23 },
+  footerShell: { width: '100%', maxWidth: 1180, alignSelf: 'center', borderRadius: radius.xl, borderWidth: 1, borderColor: colors.border, padding: spacing.xl, marginTop: spacing.lg, ...shadows.card },
+  footerShellPhone: { padding: spacing.lg, borderRadius: radius.lg },
+  footerTop: { flexDirection: 'row', flexWrap: 'wrap', gap: spacing.xxl },
+  footerTopMobile: { flexDirection: 'column', gap: spacing.xl },
+  footerBrandBlock: { flex: 1, minWidth: 280 },
+  footerLogoRow: { flexDirection: 'row', alignItems: 'center', gap: spacing.md },
+  footerLogoMark: { width: 48, height: 48, borderRadius: 16, alignItems: 'center', justifyContent: 'center', backgroundColor: colors.accentSoft, borderWidth: 1, borderColor: 'rgba(0,174,239,0.36)' },
+  footerBrand: { fontFamily: fonts.headingBold, color: colors.textPrimary, fontSize: 18, letterSpacing: 3 },
+  footerSubBrand: { fontFamily: fonts.bodyMedium, color: colors.textMuted, fontSize: 11, marginTop: 2 },
+  footerText: { marginTop: spacing.lg, fontFamily: fonts.bodyMedium, color: colors.textSecondary, fontSize: 14, lineHeight: 23, maxWidth: 460 },
+  footerBadges: { marginTop: spacing.lg, flexDirection: 'row', flexWrap: 'wrap', gap: spacing.sm },
+  footerBadge: { paddingVertical: spacing.sm, paddingHorizontal: spacing.md, borderRadius: radius.pill, backgroundColor: colors.accentSoft, borderWidth: 1, borderColor: 'rgba(0,174,239,0.28)' },
+  footerBadgeText: { fontFamily: fonts.bodyBold, color: colors.accent, fontSize: 11 },
+  footerGrid: { flex: 1.2, minWidth: 320, flexDirection: 'row', flexWrap: 'wrap', gap: spacing.xl },
+  footerGridMobile: { width: '100%', minWidth: 0, flex: 0, gap: spacing.lg },
+  footerColumn: { minWidth: 150, gap: spacing.sm },
+  footerColumnTitle: { fontFamily: fonts.bodyBold, color: colors.textPrimary, fontSize: 13, textTransform: 'uppercase', letterSpacing: 1, marginBottom: spacing.sm },
+  footerLink: { fontFamily: fonts.bodySemiBold, color: colors.accent, fontSize: 13, lineHeight: 22 },
+  footerMutedLink: { fontFamily: fonts.bodyMedium, color: colors.textSecondary, fontSize: 13, lineHeight: 22 },
+  externalLinkRow: { flexDirection: 'row', alignItems: 'center', gap: spacing.xs },
+  footerDivider: { height: 1, backgroundColor: colors.border, marginVertical: spacing.xl },
+  footerBottom: { gap: spacing.sm },
+  footerLegal: { fontFamily: fonts.bodyBold, color: colors.silver, fontSize: 13, lineHeight: 20 },
+  footerDisclaimer: { fontFamily: fonts.bodyMedium, color: colors.textMuted, fontSize: 12, lineHeight: 19 },
 });

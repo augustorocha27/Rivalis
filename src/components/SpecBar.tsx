@@ -4,6 +4,7 @@ import { MotiView } from 'moti';
 import { LinearGradient } from 'expo-linear-gradient';
 
 import { colors, fonts, radius, spacing } from '../theme';
+import { useResponsive } from '../theme/responsive';
 
 type SpecBarProps = {
   label: string;
@@ -15,6 +16,7 @@ type SpecBarProps = {
 };
 
 export function SpecBar({ label, value, referenceValue, unit, diffPercent, delay = 0 }: SpecBarProps) {
+  const { isPhone } = useResponsive();
   const rivalWins = value >= referenceValue;
   const biggest = Math.max(value, referenceValue, 1);
   const fillWidth = Math.max(8, Math.min(100, (value / biggest) * 100));
@@ -24,17 +26,17 @@ export function SpecBar({ label, value, referenceValue, unit, diffPercent, delay
 
   return (
     <View style={styles.container}>
-      <View style={styles.headerRow}>
+      <View style={[styles.headerRow, isPhone && styles.headerRowPhone]}>
         <Text style={styles.label}>{label}</Text>
         <View style={[styles.diffPill, rivalWins ? styles.diffPillWin : styles.diffPillLose]}>
           <Text style={[styles.diffText, rivalWins ? styles.diffTextWin : styles.diffTextLose]}>{diffLabel}</Text>
         </View>
       </View>
 
-      <View style={styles.valueRow}>
-        <Text style={styles.valueText}>{value}</Text>
+      <View style={[styles.valueRow, isPhone && styles.valueRowPhone]}>
+        <Text style={[styles.valueText, isPhone && styles.valueTextPhone]}>{value}</Text>
         <Text style={styles.unitText}>{unit}</Text>
-        <Text style={styles.referenceText}>Ref. {referenceValue} {unit}</Text>
+        <Text style={[styles.referenceText, isPhone && styles.referenceTextPhone]}>Ref. {referenceValue} {unit}</Text>
       </View>
 
       <View style={styles.track}>
@@ -60,6 +62,10 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
+    gap: spacing.sm,
+  },
+  headerRowPhone: {
+    alignItems: 'flex-start',
   },
   label: {
     fontFamily: fonts.bodySemiBold,
@@ -95,12 +101,19 @@ const styles = StyleSheet.create({
   valueRow: {
     flexDirection: 'row',
     alignItems: 'baseline',
+    flexWrap: 'wrap',
     gap: 5,
+  },
+  valueRowPhone: {
+    alignItems: 'center',
   },
   valueText: {
     fontFamily: fonts.heading,
     color: colors.textPrimary,
     fontSize: 22,
+  },
+  valueTextPhone: {
+    fontSize: 19,
   },
   unitText: {
     fontFamily: fonts.bodyMedium,
@@ -112,6 +125,11 @@ const styles = StyleSheet.create({
     fontFamily: fonts.bodyMedium,
     color: colors.textMuted,
     fontSize: 11,
+  },
+  referenceTextPhone: {
+    width: '100%',
+    marginLeft: 0,
+    marginTop: 2,
   },
   track: {
     height: 11,
