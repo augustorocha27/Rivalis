@@ -1,3 +1,10 @@
+| Nome | RM / Matrícula | Função no Projeto |
+|---|---|---|
+| Augusto Rocha Silva | RM556316| Desenvolvimento Front-end |
+| Guilherme Vieira Augusto | RM557264 | Desenvolvimento Back-end |
+| Erik Yuuta Goto | RM558076 | UX/UI e Prototipação |
+| Wendell dos Santos Silva | RM558859 | Testes e Validação |
+
 # Rivalis
 
 O **Rivalis** é uma aplicação desenvolvida para apoiar colaboradores da Ford em análises comparativas entre veículos Ford e concorrentes diretos do mercado.
